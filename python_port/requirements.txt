@@ -1,0 +1,11 @@
+# Core dependencies
+Pillow>=9.0.0  # For image handling (map rendering)
+
+# Optional dependencies for development
+pytest>=7.0.0
+black>=23.0.0
+flake8>=6.0.0
+mypy>=1.0.0
+
+# For running the CLI
+argparse>=1.4.0

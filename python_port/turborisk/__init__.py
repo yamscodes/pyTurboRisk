@@ -1,0 +1,23 @@
+"""
+TurboRisk Game Engine
+
+Core modules for the TurboRisk game.
+"""
+
+from .globals import G, VERSION, MAXTERRITORIES, MAXPLAYERS
+from .territory import setup_territories, load_map, is_adjacent, is_frontier
+from .exp_subr import (
+    t_name, t_owner, t_armies, t_continent, t_borders_count, t_border,
+    t_is_bordering, t_is_front, t_is_mine, t_is_entry, t_fronts_count,
+    t_front, t_strongest_front, t_weakest_front, t_pressure, t_distance,
+    t_shortest_path, t_weakest_path, t_path_to_front,
+    p_me, p_name, p_program, p_active, p_alive, p_human, p_armies_count,
+    p_new_armies, p_territories_count, p_card_count, p_card_turn_in_value,
+    c_owner, c_bonus, c_territories_count, c_territory, c_borders_count,
+    c_border, c_entries_count, c_entry, c_analysis, c_leader,
+    s_conquest, s_players_count, s_alive_players_count, s_cards_based_on_combo,
+    u_message, u_log, u_buffer_set, u_buffer_get, u_random, u_take_snapshot,
+    u_dialog, u_abort_game, u_log_off, u_log_on, u_message_off, u_message_on,
+    u_dialog_off, u_dialog_on, u_snapshot_off, u_snapshot_on,
+    set_urandom_seed, TRP_FUNCTIONS
+)
