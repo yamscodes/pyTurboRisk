@@ -387,6 +387,23 @@ G = GlobalState()
 
 
 # ============================================================================
+# SCRIPT EXECUTION
+# ============================================================================
+
+# ScriptExec will be initialized when trp_engine is imported
+# This is a placeholder to avoid circular imports
+ScriptExec = None
+
+
+def init_script_exec():
+    """Initialize the script executor"""
+    global ScriptExec
+    from .trp_engine import ScriptExec as SE
+    ScriptExec = SE
+    return ScriptExec
+
+
+# ============================================================================
 # UTILITY FUNCTIONS
 # ============================================================================
 

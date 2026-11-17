@@ -257,7 +257,14 @@ Concurrent runs must use different game-log and CPU-log paths.
             G.ar_player[i].name = os.path.splitext(player_file)[0]
             G.ar_player[i].active = True
             G.ar_player[i].computer = True
-            G.ar_player[i].prg_file = player_file
+            
+            # Set the program file path
+            players_dir = os.path.join(os.path.dirname(__file__), '..', '..', 'players')
+            if not os.path.exists(players_dir):
+                players_dir = os.path.join(os.path.dirname(__file__), 'players')
+            full_path = os.path.join(players_dir, player_file)
+            G.ar_player[i].prg_file = full_path
+            
             G.ar_player[i].color = DEFAULT_COLORS[(i - 1) % len(DEFAULT_COLORS)]
             G.ar_player[i].cards_handling = CardsHandling.SMART
             G.ar_player[i].keep_log = True

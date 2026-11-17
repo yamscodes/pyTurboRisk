@@ -7,11 +7,13 @@ Ported from Computer.pas
 """
 
 import time
-from typing import Optional, List, Dict, Any
+import os
+from typing import Optional, List, Dict, Any, Tuple
 
 from .globals import G, MAXTERRITORIES, MAXPLAYERS, GameState, RoutineType, SimStatus
 from .territory import claim_territory, place_armies, transfer_armies, is_adjacent
 from .exp_subr import set_urandom_seed
+from .trp_engine import ScriptExec, TRPError
 
 
 class TRPError(Exception):
@@ -97,16 +99,31 @@ class ComputerPlayer:
     
     def execute_assignment(self):
         """Execute the assignment routine for the computer player"""
+        from .exp_subr import t_owner
+        
         to_territory = 0
         
         try:
             self.cpu_phase(RoutineType.ASSIGNMENT)
             start_time = time.time()
             
-            # Execute the TRP ASSIGNMENT procedure
-            # This would call the script's ASSIGNMENT function
-            # For now, we'll use a simple AI
-            to_territory = self.simple_assignment_ai()
+            # Try to use the TRP script if available
+            player = G.ar_player[G.i_turn]
+            if player.prg_file and os.path.exists(player.prg_file):
+                try:
+                    ScriptExec.create_context()
+                    ScriptExec.set_player(G.i_turn)
+                    if ScriptExec.load_from_file(player.prg_file):
+                        result = ScriptExec.run_procedure('ASSIGNMENT', [0])
+                        if result and len(result) > 0:
+                            to_territory = result[0]
+                except Exception as e:
+                    self.log_trp_decision(f"TRP ASSIGNMENT error: {str(e)}")
+                    to_territory = 0
+            
+            # If TRP didn't return a valid territory, use simple AI
+            if to_territory < 1 or to_territory > MAXTERRITORIES:
+                to_territory = self.simple_assignment_ai()
             
             self.end_time = time.time()
             self.cpu_call(RoutineType.ASSIGNMENT, int((self.end_time - start_time) * 1000))
@@ -137,8 +154,26 @@ class ComputerPlayer:
     
     def simple_assignment_ai(self) -> int:
         """Simple AI for territory assignment - pick the first available territory"""
-        # In a real implementation, this would call the TRP script
-        # For now, just pick territories in order
+        # Try to use the TRP script if available
+        player = G.ar_player[G.i_turn]
+        if player.prg_file and os.path.exists(player.prg_file):
+            try:
+                # Load the script
+                ScriptExec.create_context()
+                ScriptExec.set_player(G.i_turn)
+                if not ScriptExec.load_from_file(player.prg_file):
+                    self.log_trp_decision(f"Failed to load script: {ScriptExec.exception_message}")
+                else:
+                    # Execute the ASSIGNMENT procedure
+                    result = ScriptExec.run_procedure('ASSIGNMENT', [0])
+                    if result and len(result) > 0:
+                        to_territory = result[0]
+                        if to_territory and 1 <= to_territory <= MAXTERRITORIES:
+                            return to_territory
+            except Exception as e:
+                self.log_trp_decision(f"Error in ASSIGNMENT: {str(e)}")
+        
+        # Fallback to simple AI
         for i in range(1, MAXTERRITORIES + 1):
             if G.ar_territory[i].owner == 0:
                 return i
@@ -184,8 +219,26 @@ class ComputerPlayer:
     
     def simple_placement_ai(self) -> int:
         """Simple AI for army placement - reinforce the strongest territory"""
-        # In a real implementation, this would call the TRP script
-        # For now, just pick the first owned territory
+        # Try to use the TRP script if available
+        player = G.ar_player[G.i_turn]
+        if player.prg_file and os.path.exists(player.prg_file):
+            try:
+                # Load the script
+                ScriptExec.create_context()
+                ScriptExec.set_player(G.i_turn)
+                if not ScriptExec.load_from_file(player.prg_file):
+                    self.log_trp_decision(f"Failed to load script: {ScriptExec.exception_message}")
+                else:
+                    # Execute the PLACEMENT procedure
+                    result = ScriptExec.run_procedure('PLACEMENT', [0])
+                    if result and len(result) > 0:
+                        to_territory = result[0]
+                        if to_territory and 1 <= to_territory <= MAXTERRITORIES:
+                            return to_territory
+            except Exception as e:
+                self.log_trp_decision(f"Error in PLACEMENT: {str(e)}")
+        
+        # Fallback to simple AI
         for i in range(1, MAXTERRITORIES + 1):
             if G.ar_territory[i].owner == G.i_turn:
                 return i
@@ -244,8 +297,27 @@ class ComputerPlayer:
     
     def simple_attack_ai(self) -> Tuple[int, int]:
         """Simple AI for attacks - find the first valid attack"""
-        # In a real implementation, this would call the TRP script
-        # For now, just find the first owned territory that can attack
+        # Try to use the TRP script if available
+        player = G.ar_player[G.i_turn]
+        if player.prg_file and os.path.exists(player.prg_file):
+            try:
+                # Load the script
+                ScriptExec.create_context()
+                ScriptExec.set_player(G.i_turn)
+                if not ScriptExec.load_from_file(player.prg_file):
+                    self.log_trp_decision(f"Failed to load script: {ScriptExec.exception_message}")
+                else:
+                    # Execute the ATTACK procedure
+                    result = ScriptExec.run_procedure('ATTACK', [0, 0])
+                    if result and len(result) >= 2:
+                        from_territory = result[0]
+                        to_territory = result[1]
+                        if from_territory and to_territory:
+                            return (from_territory, to_territory)
+            except Exception as e:
+                self.log_trp_decision(f"Error in ATTACK: {str(e)}")
+        
+        # Fallback to simple AI
         for from_t in range(1, MAXTERRITORIES + 1):
             if G.ar_territory[from_t].owner == G.i_turn:
                 for i in range(1, G.ar_territory[from_t].nbord + 1):
@@ -291,8 +363,26 @@ class ComputerPlayer:
     
     def simple_occupation_ai(self, from_territory: int, to_territory: int) -> int:
         """Simple AI for occupation - move all but 1 army"""
-        # In a real implementation, this would call the TRP script
-        # For now, move all but 1 army
+        # Try to use the TRP script if available
+        player = G.ar_player[G.i_turn]
+        if player.prg_file and os.path.exists(player.prg_file):
+            try:
+                # Load the script
+                ScriptExec.create_context()
+                ScriptExec.set_player(G.i_turn)
+                if not ScriptExec.load_from_file(player.prg_file):
+                    self.log_trp_decision(f"Failed to load script: {ScriptExec.exception_message}")
+                else:
+                    # Execute the OCCUPATION procedure
+                    result = ScriptExec.run_procedure('OCCUPATION', [from_territory, to_territory, 0])
+                    if result and len(result) >= 1:
+                        armies = result[0]
+                        if armies is not None:
+                            return armies
+            except Exception as e:
+                self.log_trp_decision(f"Error in OCCUPATION: {str(e)}")
+        
+        # Fallback to simple AI
         armies = G.ar_territory[from_territory].army - 1
         return max(1, armies)
     
@@ -356,8 +446,28 @@ class ComputerPlayer:
     
     def simple_fortification_ai(self) -> Tuple[int, int, int]:
         """Simple AI for fortification - find the first valid fortification"""
-        # In a real implementation, this would call the TRP script
-        # For now, just find the first owned territory that can fortify another
+        # Try to use the TRP script if available
+        player = G.ar_player[G.i_turn]
+        if player.prg_file and os.path.exists(player.prg_file):
+            try:
+                # Load the script
+                ScriptExec.create_context()
+                ScriptExec.set_player(G.i_turn)
+                if not ScriptExec.load_from_file(player.prg_file):
+                    self.log_trp_decision(f"Failed to load script: {ScriptExec.exception_message}")
+                else:
+                    # Execute the FORTIFICATION procedure
+                    result = ScriptExec.run_procedure('FORTIFICATION', [0, 0, 0])
+                    if result and len(result) >= 3:
+                        from_territory = result[0]
+                        to_territory = result[1]
+                        armies = result[2]
+                        if from_territory and to_territory and armies:
+                            return (from_territory, to_territory, armies)
+            except Exception as e:
+                self.log_trp_decision(f"Error in FORTIFICATION: {str(e)}")
+        
+        # Fallback to simple AI
         for from_t in range(1, MAXTERRITORIES + 1):
             if G.ar_territory[from_t].owner == G.i_turn and G.ar_territory[from_t].army > 1:
                 for i in range(1, G.ar_territory[from_t].nbord + 1):
