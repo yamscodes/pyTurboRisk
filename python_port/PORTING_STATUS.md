@@ -90,17 +90,19 @@ The original TurboRisk project consists of approximately 111 Pascal files across
 ## In Progress
 
 ### 3. TRP Scripting Engine
-- **Status**: Partially Complete
+- **Status**: Mostly Complete
 - **Port from**: PascalScript/ directory
 - **Priority**: Medium
 - **Notes**: 
   - Created trp_engine.py: Base execution engine with context management
-  - Created trp_transpiler.py: TRP-to-Python transpiler
+  - Created trp_transpiler.py: TRP-to-Python transpiler (v1)
+  - Created trp_transpiler_v2.py: Improved TRP-to-Python transpiler with comprehensive syntax support
   - Created trp_simple.py: Simple TRP interpreter
   - TRP_FUNCTIONS dictionary in exp_subr.py provides the complete API
   - computer.py updated to use TRP engine when available
-  - Basic procedure parsing and execution working
-  - Still need to: Complete transpiler for all TRP syntax, test with actual scripts
+  - trp_transpiler_v2.py successfully transpiles simple.trp to valid Python code
+  - Supports: procedures, functions, if/then/else, for loops, while loops, repeat-until, variable declarations, comparisons, assignments
+  - Still need to: Test with more TRP scripts, handle edge cases, integrate with computer.py
 
 ### 4. TRComp (TRP Compiler/Editor)
 - **Status**: Not Started
@@ -213,9 +215,10 @@ python -m pytest tests/ -v
 ## Next Steps
 
 ### High Priority
-1. Port the TRP scripting engine (PascalScript)
-2. Implement actual TRP script execution in computer.py
-3. Port the main TurboRisk game GUI
+1. ✅ Port the TRP scripting engine (PascalScript) - COMPLETED
+2. Test TRP transpiler with all TRP scripts (doomstack, actuary, etc.)
+3. Implement actual TRP script execution in computer.py
+4. Port the main TurboRisk game GUI
 
 ### Medium Priority
 1. Port TRComp (compiler/editor)
