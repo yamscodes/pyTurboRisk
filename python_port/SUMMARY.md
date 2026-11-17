@@ -122,8 +122,10 @@ python -m pytest tests/ -v
 
 ### Medium Priority (Next Steps)
 1. **TRP Scripting Engine** (PascalScript)
-   - Currently using simple AI placeholders
-   - Need to port the PascalScript compiler and runtime
+   - Framework created (trp_engine.py, trp_transpiler.py, trp_simple.py)
+   - TRP_FUNCTIONS dictionary provides complete API
+   - Basic procedure parsing and execution working
+   - Need to complete transpiler for all TRP syntax
    - This will enable running actual .trp bot scripts
 
 2. **Main TurboRisk Game GUI**

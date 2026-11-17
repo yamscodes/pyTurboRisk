@@ -90,10 +90,17 @@ The original TurboRisk project consists of approximately 111 Pascal files across
 ## In Progress
 
 ### 3. TRP Scripting Engine
-- **Status**: Not Started
+- **Status**: Partially Complete
 - **Port from**: PascalScript/ directory
 - **Priority**: Medium
-- **Notes**: The TRP_FUNCTIONS dictionary in exp_subr.py provides the API, but the actual PascalScript compiler and runtime are not yet ported.
+- **Notes**: 
+  - Created trp_engine.py: Base execution engine with context management
+  - Created trp_transpiler.py: TRP-to-Python transpiler
+  - Created trp_simple.py: Simple TRP interpreter
+  - TRP_FUNCTIONS dictionary in exp_subr.py provides the complete API
+  - computer.py updated to use TRP engine when available
+  - Basic procedure parsing and execution working
+  - Still need to: Complete transpiler for all TRP syntax, test with actual scripts
 
 ### 4. TRComp (TRP Compiler/Editor)
 - **Status**: Not Started
