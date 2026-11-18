@@ -267,15 +267,15 @@ class TRPTranspilerV2:
         while i < len(cleaned_lines):
             line, depth = cleaned_lines[i]
             
-            # Check if this line starts with a logical operator that should be joined with previous
-            # Only join if the previous line is a condition (not a statement)
-            if (line.startswith('and ') or line.startswith('or ') or line.startswith('not ') or
-                line.startswith('= ') or line.startswith('<> ') or line.startswith('>=') or 
-                line.startswith('<=') or line.startswith('> ') or line.startswith('< ')):
-                if final_lines:
-                    prev_line = final_lines[-1]
+            # Check if this line should be joined with the previous line (multi-line condition)
+            if final_lines:
+                prev_line = final_lines[-1]
+                
+                # Join if this line starts with a logical operator
+                if (line.startswith('and ') or line.startswith('or ') or line.startswith('not ') or
+                    line.startswith('= ') or line.startswith('<> ') or line.startswith('>=') or 
+                    line.startswith('<=') or line.startswith('> ') or line.startswith('< ')):
                     # Only join if previous line is part of a condition
-                    # (doesn't end with :=, then, do, etc.)
                     if not (prev_line.endswith('then') or prev_line.endswith('do') or 
                             ':=' in prev_line or prev_line.endswith(':')):
                         final_lines.pop()
@@ -283,6 +283,15 @@ class TRPTranspilerV2:
                         final_lines.append(combined)
                         i += 1
                         continue
+                
+                # Join if this line starts with '(' and previous line ends with 'or' or 'and'
+                if line.startswith('(') and (prev_line.rstrip().endswith('or') or prev_line.rstrip().endswith('and')):
+                    final_lines.pop()
+                    combined = prev_line + ' ' + line
+                    final_lines.append(combined)
+                    i += 1
+                    continue
+                
             
             final_lines.append(line)
             i += 1
@@ -405,7 +414,10 @@ class TRPTranspilerV2:
             line_lower = line.lower().strip()
             
             # Determine if this line starts a new block
+            # Check for block-starting statements (end with : but are not else/elif)
             is_block_start = line_lower.endswith(':') and not line_lower.startswith(('else:', 'elif'))
+            # Also check for single-line if statements (if ...: body)
+            is_single_line_if = line_lower.startswith('if ') and ':' in line_lower and not line_lower.endswith(':')
             is_elif = line_lower.startswith('elif ')
             is_else = line_lower.startswith('else:')
             
@@ -432,7 +444,7 @@ class TRPTranspilerV2:
                         indented_lines.append(pass_line)
             
             # Update indent stack
-            if is_block_start:
+            if is_block_start or is_single_line_if:
                 indent_stack.append(current_indent + 1)
             elif is_elif or is_else:
                 # elif/else are at the same level as if, but their body needs indentation

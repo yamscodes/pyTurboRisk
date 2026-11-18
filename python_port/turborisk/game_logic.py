@@ -182,8 +182,8 @@ def supervisor():
     Main game supervisor/loop.
     Ported from Supervisor procedure in Globals.pas
     """
-    from .computer import computer
-    from .human import human
+    from .computer import computer, execute_computer_turn
+    from .cards import draw_card as cards_draw_card
     
     while True:
         if G.bStopASAP:
@@ -200,26 +200,74 @@ def supervisor():
         if G.game_state == GameState.STOPPED:
             return
         
-        # Determine whose turn it is
-        current_player = G.ar_player[G.i_turn]
-        
-        if current_player.computer:
-            # Computer player turn
+        # Handle the case where we enter here after having waited for a Human Player to move
+        if G.bHumanTurn:
             G.bHumanTurn = False
-            computer.execute_computer_turn()
-        else:
-            # Human player turn
-            G.bHumanTurn = True
-            # Human turn is handled by GUI events
+            # Assign a card if necessary
+            if G.game_state == GameState.PLAYING and G.ar_player[G.i_turn].fl_conq:
+                cards_draw_card()
+            # Pass the turn to the next player
+            next_player()
             return
         
-        # After computer turn, check for game over
-        if check_game_over():
-            game_cleanup()
-            return
+        # Check game state and execute appropriate phase
+        if G.game_state == GameState.ASSIGNING:
+            # Assignment phase
+            # This is handled by computer.execute_assignment() or human interaction
+            if G.ar_player[G.i_turn].computer:
+                execute_computer_turn()
+            else:
+                G.bHumanTurn = True
+                return
         
-        # Move to next player
-        next_player()
+        elif G.game_state == GameState.DISTRIBUTING:
+            # Distribution phase
+            if G.ar_player[G.i_turn].computer:
+                execute_computer_turn()
+            else:
+                G.bHumanTurn = True
+                return
+        
+        elif G.game_state == GameState.PLAYING:
+            # Check if game has been won
+            if G.i_n_players < 2:
+                # Game over - someone has conquered the world
+                game_cleanup()
+                return
+            
+            # Prepare and execute a move
+            if G.ar_player[G.i_turn].active and G.ar_player[G.i_turn].territ > 0:
+                # Initialize turn
+                G.ar_player[G.i_turn].fl_conq = False
+                G.ar_player[G.i_turn].fl_move = False
+                
+                # Assign new armies
+                assign_new_armies(False)
+                
+                # Execute a move
+                if G.ar_player[G.i_turn].computer:
+                    # Computer player
+                    execute_computer_turn()
+                    # Pick a new card if at least one territory has been conquered
+                    if G.ar_player[G.i_turn].fl_conq:
+                        cards_draw_card()
+                    next_player()
+                else:
+                    # Human player
+                    if G.ar_player[G.i_turn].new_army > 0:
+                        G.human_phase = HumanPhase.PLACEMENT
+                    else:
+                        G.human_phase = HumanPhase.ATTACK
+                    
+                    G.from_territory = 0
+                    G.to_territory = 0
+                    
+                    # Human player: wait for a move
+                    G.bHumanTurn = True
+                    return
+            else:
+                # Skip inactive player
+                next_player()
         
         # Update turn counter
         G.i_turn_counter += 1
@@ -350,53 +398,210 @@ def placement_phase():
 # Attack Phase
 # =============================================================================
 
-def attack_phase(from_terr: int, to_terr: int) -> bool:
+def perform_attack(attacker_terr: int, defender_terr: int) -> Tuple[bool, str]:
+    """
+    Perform a single attack between two territories.
+    Ported from PerformAttack in Globals.pas
+    
+    Args:
+        attacker_terr: Territory attacking from
+        defender_terr: Territory being attacked
+    
+    Returns:
+        Tuple of (conquest_successful, message)
+    """
+    import random
+    
+    # Get defender
+    defender = G.ar_territory[defender_terr].owner
+    moved_armies = 0
+    
+    # Reset elimination flag
+    G.b_eliminated_player = False
+    
+    # Save initial armies
+    initial_attacker = G.ar_territory[attacker_terr].army
+    initial_defender = G.ar_territory[defender_terr].army
+    
+    # Determine number of dice
+    # Attacker can use up to 3 dice (army - 1)
+    attacker_dice_count = min(G.ar_territory[attacker_terr].army - 1, 3)
+    # Defender can use up to 2 dice
+    defender_dice_count = min(G.ar_territory[defender_terr].army, 2)
+    
+    # Roll dice
+    attacker_dice = throw_dice(attacker_dice_count)
+    defender_dice = throw_dice(defender_dice_count)
+    
+    # Compare dice and count losses
+    min_dice = min(attacker_dice_count, defender_dice_count)
+    attacker_losses = 0
+    defender_losses = 0
+    
+    for i in range(min_dice):
+        if attacker_dice[i] > defender_dice[i]:
+            defender_losses += 1
+        else:
+            attacker_losses += 1
+    
+    # Build message
+    msg = f"A:[{'-'.join(map(str, attacker_dice[:attacker_dice_count]))}] "
+    msg += f"D:[{'-'.join(map(str, defender_dice[:defender_dice_count]))}] "
+    
+    if attacker_losses == 2:
+        msg += "Attacker loses 2 armies."
+    elif defender_losses == 2:
+        msg += "Defender loses 2 armies."
+    elif attacker_losses == 1 and defender_losses == 1:
+        msg += "Both sides lose 1 army."
+    elif attacker_losses == 1:
+        msg += "Attacker loses 1 army."
+    elif defender_losses == 1:
+        msg += "Defender loses 1 army."
+    
+    # Update territories
+    opponent = 0
+    G.ar_territory[attacker_terr].army -= attacker_losses
+    G.ar_territory[defender_terr].army -= defender_losses
+    
+    # Check if territory was conquered
+    if G.ar_territory[defender_terr].army == 0:
+        # Conquered territory
+        msg += f" {t_name(defender_terr)} conquered."
+        
+        # Assign territory to attacker
+        from .territory import claim_territory
+        claim_territory(defender_terr, G.i_turn)
+        
+        # Move armies (attacker_dice_count or remaining armies - 1)
+        if attacker_dice_count >= G.ar_territory[attacker_terr].army:
+            attacker_dice_count -= 1
+        
+        G.ar_territory[attacker_terr].army -= attacker_dice_count
+        G.ar_territory[defender_terr].army += attacker_dice_count
+        moved_armies = attacker_dice_count
+        
+        G.ar_player[G.i_turn].fl_conq = True
+        opponent = defender
+        
+        # Check if opponent has been eliminated
+        if G.ar_player[opponent].territ == 0:
+            G.b_eliminated_player = True
+            G.i_rank += 1
+            G.ar_player[opponent].rank = G.i_rank
+            msg += f" {G.ar_player[opponent].name} destroyed."
+            
+            # Capture opponent's cards
+            for card_type in range(1, 5):
+                G.ar_player[G.i_turn].cards[card_type] += G.ar_player[opponent].cards[card_type]
+                G.ar_player[opponent].cards[card_type] = 0
+            
+            # Decrease number of active players
+            G.i_n_players -= 1
+            
+            # Stop human turn if game won
+            if G.b_human_turn and G.i_n_players < 2:
+                G.b_human_turn = False
+        
+        return (True, msg)
+    else:
+        return (False, msg)
+
+
+def attack_phase(from_terr: int, to_terr: int, attack_type: str = "once") -> Tuple[bool, str]:
     """
     Handle an attack from one territory to another.
-    Ported from UomoAttacca in Human.pas
+    Ported from UomoAttacca in Human.pas and Attack.pas
     
-    Returns: True if attack was successful
+    Args:
+        from_terr: Territory attacking from
+        to_terr: Territory being attacked
+        attack_type: "once", "do_or_die", "until1", or "until2"
+    
+    Returns:
+        Tuple of (conquest_successful, message)
     """
     # Validate attack
     if from_terr < 1 or from_terr > MAXTERRITORIES:
-        return False
+        return (False, "Invalid from territory")
     
     if to_terr < 1 or to_terr > MAXTERRITORIES:
-        return False
+        return (False, "Invalid to territory")
     
     # Check if from territory belongs to current player
     if G.ar_territory[from_terr].owner != G.i_turn:
-        return False
+        return (False, "From territory not owned by you")
     
     # Check if to territory belongs to enemy
     if G.ar_territory[to_terr].owner == G.i_turn:
-        return False
+        return (False, "Cannot attack your own territory")
     
     # Check if territories are adjacent
     from .territory import is_adjacent
     if not is_adjacent(from_terr, to_terr):
-        return False
+        return (False, "Territories are not adjacent")
     
     # Check if from territory has enough armies (at least 2)
     if G.ar_territory[from_terr].army < 2:
-        return False
+        return (False, "Not enough armies to attack")
     
-    # TODO: Implement actual attack logic (dice rolling, etc.)
-    # For now, just simulate a successful attack
+    # Perform attack based on type
+    if attack_type == "once":
+        conquest, msg = perform_attack(from_terr, to_terr)
+        return (conquest, msg)
     
-    # Attacker wins
-    # Transfer armies
-    attacking_armies = G.ar_territory[from_terr].army - 1  # Leave at least 1 behind
-    G.ar_territory[from_terr].army = 1
-    G.ar_territory[to_terr].owner = G.i_turn
-    G.ar_territory[to_terr].army = attacking_armies
+    elif attack_type == "do_or_die":
+        # Keep attacking until conquest or only 1 army left
+        while True:
+            conquest, msg = perform_attack(from_terr, to_terr)
+            if conquest or G.ar_territory[from_terr].army < 2:
+                return (conquest, msg)
     
-    G.ar_player[G.i_turn].territ += 1
+    elif attack_type == "until1":
+        # Attack until conquest or attacker has <= target armies
+        # For now, default to 1
+        target = 1
+        while True:
+            if G.ar_territory[from_terr].army <= target:
+                return (False, "Attacker has too few armies")
+            conquest, msg = perform_attack(from_terr, to_terr)
+            if conquest or G.ar_territory[from_terr].army < 2:
+                return (conquest, msg)
     
-    # Update human phase
-    G.human_phase = HumanPhase.OCCUPATION
+    elif attack_type == "until2":
+        # Attack until conquest or defender has <= target armies
+        # For now, default to 1
+        target = 1
+        while True:
+            if G.ar_territory[to_terr].army <= target:
+                return (False, "Defender has too few armies")
+            conquest, msg = perform_attack(from_terr, to_terr)
+            if conquest or G.ar_territory[from_terr].army < 2:
+                return (conquest, msg)
     
-    return True
+    return (False, "Invalid attack type")
+
+
+def throw_dice(num_dice: int) -> List[int]:
+    """
+    Roll dice and return sorted results (descending).
+    Ported from ThrowDice in Globals.pas
+    
+    Args:
+        num_dice: Number of dice to roll (1-3)
+    
+    Returns:
+        List of dice values sorted in descending order
+    """
+    import random
+    
+    # Roll dice
+    dice = [random.randint(1, 6) for _ in range(num_dice)]
+    
+    # Sort in descending order
+    dice.sort(reverse=True)
+    
+    return dice
 
 
 def occupation_phase(from_terr: int, to_terr: int, armies: int) -> bool:
@@ -433,7 +638,7 @@ def occupation_phase(from_terr: int, to_terr: int, armies: int) -> bool:
     G.ar_player[G.i_turn].fl_move = True
     
     # Move to next phase
-    G.human_phase = HumanPhase.FORTIFICATION
+    G.human_phase = HumanPhase.PLACEMENT
     
     return True
 
@@ -486,16 +691,23 @@ def draw_card() -> Optional[int]:
     Draw a card for the current player.
     Returns: Card type or None if no card available
     """
-    # TODO: Implement card drawing logic
+    from .cards import draw_card as cards_draw_card
+    cards_draw_card()
+    # Return the last card type drawn (stored in G)
+    # For now, just return None as the card was already added to the player
     return None
 
 
 def turn_in_cards(card_set: List[int]) -> int:
     """
-    Turn in a set of cards.
+    Turn in a set of cards for armies.
+    Args:
+        card_set: List of 4 integers [inf, cav, art, jok] representing cards to turn in
     Returns: Number of armies awarded
     """
-    # TODO: Implement card turn-in logic
+    from .cards import trade_cards
+    if len(card_set) >= 4:
+        return trade_cards(card_set[0], card_set[1], card_set[2], card_set[3])
     return 0
 
 

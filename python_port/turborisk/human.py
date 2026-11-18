@@ -29,7 +29,8 @@ from .globals import (
 )
 from .territory import is_adjacent, transfer_armies
 from .exp_subr import t_name, t_owner, t_armies, t_continent
-from .game_logic import set_from_territory, set_to_territory, get_from_territory, get_to_territory
+from .game_logic import set_from_territory, set_to_territory, get_from_territory, get_to_territory, attack_phase
+from .cards import draw_card
 
 
 # =============================================================================
@@ -70,31 +71,51 @@ def show_instructions():
     return msg
 
 
-def human_attack(from_terr: int, to_terr: int) -> bool:
+def human_attack(from_terr: int, to_terr: int, attack_type: str = "once") -> bool:
     """
     Handle human attack.
     Ported from UomoAttacca in Human.pas
     
-    Returns: True if attack was successful
+    Args:
+        from_terr: Territory attacking from
+        to_terr: Territory being attacked
+        attack_type: Type of attack ("once", "do_or_die", "until1", "until2")
+    
+    Returns: True if attack was successful (territory conquered)
     """
     # Show attack dialog
     attack_dlg = AttackDialog(G.main_gui.root if hasattr(G, 'main_gui') and G.main_gui else None)
     attack_dlg.iTf = from_terr
     attack_dlg.iTt = to_terr
+    attack_dlg.attack_type = attack_type
     
     if attack_dlg.show_modal():
-        # Attack was successful
-        # Check if all opponents have been eliminated
-        # TODO: Check bEliminatedPlayer and iNPlayers
+        # Perform the attack
+        conquest, msg = attack_phase(from_terr, to_terr, attack_dlg.attack_type)
         
-        # Move troops into the conquered territory
-        if G.ar_territory[from_terr].army > 1:
-            human_move(from_terr, to_terr, False)
+        # Update status
+        if hasattr(G, 'main_gui') and G.main_gui:
+            G.main_gui.status_panels[2].config(text=msg)
         
-        # Check whether captured cards should be traded
-        # TODO: Check bEliminatedPlayer and RImmediateTrade
+        # Check if territory was conquered
+        if conquest:
+            # Move troops into the conquered territory if auto-move is enabled
+            if attack_dlg.chk_auto_move.get() and G.ar_territory[from_terr].army > 1:
+                human_move(from_terr, to_terr, False)
+            
+            # Check if all opponents have been eliminated
+            if G.b_eliminated_player:
+                # Draw a card if in playing state
+                if G.game_state == GameState.PLAYING and G.ar_player[G.i_turn].fl_conq:
+                    draw_card()
+                
+                # Check if game is over
+                if G.i_n_players < 2:
+                    G.b_human_turn = False
+            
+            return True
         
-        return True
+        return False
     
     return False
 
@@ -156,6 +177,7 @@ class AttackDialog:
         self.result = False
         self.iTf = 0  # From territory
         self.iTt = 0  # To territory
+        self.attack_type = "once"  # Default attack type
     
     def show_modal(self) -> bool:
         """Show the dialog modally and return True if attack was successful"""
@@ -193,9 +215,9 @@ class AttackDialog:
         button_frame = ttk.Frame(main_frame)
         button_frame.grid(row=5, column=0, columnspan=2, pady=5)
         
-        ttk.Button(button_frame, text="Attack Once", command=self.cmd_attack_click).pack(side=tk.LEFT, padx=5)
-        ttk.Button(button_frame, text="Attack Until Win or 1", command=self.cmd_attack_until1_click).pack(side=tk.LEFT, padx=5)
-        ttk.Button(button_frame, text="Do or Die", command=self.cmd_do_or_die_click).pack(side=tk.LEFT, padx=5)
+        ttk.Button(button_frame, text="Attack Once", command=lambda: self.set_attack_type("once")).pack(side=tk.LEFT, padx=5)
+        ttk.Button(button_frame, text="Attack Until Win or 1", command=lambda: self.set_attack_type("until1")).pack(side=tk.LEFT, padx=5)
+        ttk.Button(button_frame, text="Do or Die", command=lambda: self.set_attack_type("do_or_die")).pack(side=tk.LEFT, padx=5)
         ttk.Button(button_frame, text="Retreat", command=self.cmd_retreat_click).pack(side=tk.LEFT, padx=5)
         
         # Auto move all checkbox
@@ -214,21 +236,9 @@ class AttackDialog:
         
         return self.result
     
-    def cmd_attack_click(self):
-        """Handle Attack Once button"""
-        # TODO: Implement attack logic
-        self.result = True
-        self.dialog.destroy()
-    
-    def cmd_attack_until1_click(self):
-        """Handle Attack Until Win or 1 button"""
-        # TODO: Implement attack until win or 1
-        self.result = True
-        self.dialog.destroy()
-    
-    def cmd_do_or_die_click(self):
-        """Handle Do or Die button"""
-        # TODO: Implement do or die attack
+    def set_attack_type(self, attack_type: str):
+        """Set the attack type and close dialog with success"""
+        self.attack_type = attack_type
         self.result = True
         self.dialog.destroy()
     
