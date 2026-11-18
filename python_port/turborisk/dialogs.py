@@ -651,7 +651,7 @@ class MapDialog:
                     map_name = os.path.basename(map_file)
                     btn = ttk.Radiobutton(self.lst_map, text=map_name, value=map_file)
                     btn.pack(anchor=tk.W)
-                    if map_name == G.sMapFile:
+                    if map_name == G.s_map_file:
                         btn.select()
             except Exception as e:
                 print(f"Error loading maps: {e}")
@@ -664,7 +664,7 @@ class MapDialog:
         for widget in self.lst_map.winfo_children():
             if isinstance(widget, ttk.Radiobutton) and widget.instate(['selected']):
                 map_file = widget.cget('value')
-                G.sMapFile = os.path.basename(map_file)
+                G.s_map_file = os.path.basename(map_file)
                 load_map()
                 break
         
