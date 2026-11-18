@@ -26,3 +26,7 @@ from .exp_subr import (
     u_dialog_off, u_dialog_on, u_snapshot_off, u_snapshot_on,
     set_urandom_seed, TRP_FUNCTIONS
 )
+from .network import (
+    NetworkMessage, NetworkMessageType, NetworkPlayer, NetworkServer,
+    NetworkClient, NetworkGameManager, start_network_game
+)
