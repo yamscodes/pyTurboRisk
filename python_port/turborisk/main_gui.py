@@ -26,6 +26,12 @@ except ImportError as e:
 from .globals import G, MAXTERRITORIES, GameState
 from .territory import setup_territories, find_territory
 from .exp_subr import t_owner, t_name
+from .game_logic import (
+    setup as game_setup, new_game_setup, supervisor, game_cleanup,
+    set_hover_territory, set_from_territory, set_to_territory,
+    get_hover_territory, get_from_territory, get_to_territory
+)
+from .human import show_instructions
 
 
 class MainGUI:
@@ -190,13 +196,12 @@ class MainGUI:
     
     def initialize_game(self):
         """Initialize game state"""
-        # Set up territories
-        setup_territories()
+        """Initialize game state"""
+        # Call game setup
+        game_setup()
         
-        # Initialize global state
-        G.bG_TRSim = False
-        G.game_state = GameState.STOPPED
-        G.bHumanTurn = False
+        # Set application path
+        G.sG_AppPath = os.path.dirname(os.path.abspath(__file__)) + os.sep
         
         # Set application path
         G.sG_AppPath = os.path.dirname(os.path.abspath(__file__)) + os.sep
@@ -253,11 +258,11 @@ class MainGUI:
                 self.status_panels[2].config(text="Preparing new game, please wait...")
                 self.root.update()
                 
-                # TODO: Call NewGameSetup
+                new_game_setup()
                 self.status_panels[2].config(text="")
                 
                 if G.game_state != GameState.STOPPED:
-                    self.supervisor()
+                    supervisor()
                 else:
                     self.game_cleanup()
         except ImportError:
@@ -441,7 +446,7 @@ class MainGUI:
         if G.bHumanTurn and G.game_state == GameState.PLAYING:
             self.set_from_territory(0)
             self.set_to_territory(0)
-            self.supervisor()
+            supervisor()
     
     def cmd_log_click(self):
         """Handle Log button click"""
@@ -510,7 +515,7 @@ class MainGUI:
             if G.bHumanTurn and G.game_state == GameState.PLAYING:
                 self.set_from_territory(0)
                 self.set_to_territory(0)
-                self.supervisor()
+                supervisor()
     
     def form_close(self):
         """Handle window close"""
@@ -520,14 +525,14 @@ class MainGUI:
     # Game state helpers
     def set_hover_territory(self, terr):
         """Set the hover territory"""
-        self.hover_territory = terr
+        set_hover_territory(terr)
         # TODO: Highlight territory on map
-    
-    def set_from_territory(self, terr):
+        """Set the from territory"""
+        set_from_territory(terr)
         """Set the from territory"""
         self.from_territory = terr
-        # TODO: Update UI
-    
+        """Set the to territory"""
+        set_to_territory(terr)
     def set_to_territory(self, terr):
         """Set the to territory"""
         self.to_territory = terr
@@ -535,21 +540,25 @@ class MainGUI:
     
     def show_instructions(self):
         """Show game instructions in status bar"""
-        # TODO: Implement based on game state
-        pass
+        """Show game instructions in status bar"""
+        show_instructions()
     
     def supervisor(self):
         """Run the game supervisor (main game loop)"""
-        # TODO: Implement game supervisor logic
+        # Use game_logic.supervisor
+        pass
         pass
     
     def game_cleanup(self):
         """Clean up game state"""
-        # TODO: Implement game cleanup
-        G.game_state = GameState.STOPPED
-        G.bHumanTurn = False
+        """Clean up game state"""
+        # Call game logic cleanup
+        game_cleanup()
+        
+        # Update GUI state
         self.toolbar_buttons["Save"].config(state=tk.DISABLED)
         self.toolbar_buttons["Restore"].config(state=tk.DISABLED)
+        self.toolbar_buttons["EndTurn"].config(state=tk.DISABLED)
         self.toolbar_buttons["EndTurn"].config(state=tk.DISABLED)
     
     def cleanup(self):
