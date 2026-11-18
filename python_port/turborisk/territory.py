@@ -7,7 +7,11 @@ Ported from Territ.pas
 
 import os
 from typing import List, Tuple, Optional
-from PIL import Image, ImageDraw, ImageFont
+try:
+    from PIL import Image, ImageDraw, ImageFont
+    PIL_AVAILABLE = True
+except ImportError:
+    PIL_AVAILABLE = False
 import configparser
 
 from .globals import G, MAXTERRITORIES, MAXBORDERS, MAXORIGINS, ContinentID, Territory, ContinentInfo
@@ -236,7 +240,9 @@ def resize_main_window():
     pass
 
 
-def flood_fill(bitmap: Image.Image, init_x: int, init_y: int, fill_color: int):
+def flood_fill(bitmap, init_x: int, init_y: int, fill_color: int):
+    if not PIL_AVAILABLE:
+        return
     """Flood fill implementation"""
     # Get the color at the initial point
     try:
