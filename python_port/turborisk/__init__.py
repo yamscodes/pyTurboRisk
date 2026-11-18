@@ -26,11 +26,27 @@ from .exp_subr import (
     u_dialog_off, u_dialog_on, u_snapshot_off, u_snapshot_on,
     set_urandom_seed, TRP_FUNCTIONS
 )
+from .computer import ComputerPlayer, execute_computer_turn
+from .game_logic import setup, new_game_setup, supervisor, game_cleanup
+from .cards import draw_card, trade_cards
 from .network import (
     NetworkMessage, NetworkMessageType, NetworkPlayer, NetworkServer,
     NetworkClient, NetworkGameManager, start_network_game
 )
-from .gui_advanced import (
-    ColorManager, StatisticsVisualizer, MapVisualizer, Tooltip,
-    GameReplay, show_advanced_statistics, show_game_replay, create_map_visualizer
-)
+
+# Import advanced GUI features (may fail if Tkinter is not available)
+try:
+    from .gui_advanced import (
+        ColorManager, StatisticsVisualizer, MapVisualizer, Tooltip,
+        GameReplay, show_advanced_statistics, show_game_replay, create_map_visualizer
+    )
+except ImportError:
+    # Tkinter not available, create dummy functions
+    ColorManager = None
+    StatisticsVisualizer = None
+    MapVisualizer = None
+    Tooltip = None
+    GameReplay = None
+    def show_advanced_statistics(root): pass
+    def show_game_replay(root): pass
+    def create_map_visualizer(parent_frame): return None
