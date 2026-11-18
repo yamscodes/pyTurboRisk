@@ -216,6 +216,28 @@ class TestTRPTranspiler(unittest.TestCase):
                             python_code = self.transpiler.transpile(script)
                             self.assertIsInstance(python_code, str)
                             self.assertGreater(len(python_code), 0)
+    
+    def test_all_players_directory_trp_files(self):
+        """Test transpiling all TRP files in python_port/players directory"""
+        players_dir = os.path.join(os.path.dirname(__file__), '..', 'players')
+        if os.path.exists(players_dir):
+            trp_files = [f for f in os.listdir(players_dir) if f.endswith('.trp')]
+            
+            # Should have at least simple.trp
+            self.assertGreaterEqual(len(trp_files), 1)
+            
+            for trp_file in trp_files:
+                with self.subTest(trp_file=trp_file):
+                    script_path = os.path.join(players_dir, trp_file)
+                    with open(script_path, 'r') as f:
+                        script = f.read()
+                    
+                    # Should not raise an exception
+                    python_code = self.transpiler.transpile(script)
+                    self.assertIsInstance(python_code, str)
+                    self.assertGreater(len(python_code), 0)
+                    # Should contain at least one function definition
+                    self.assertIn('def ', python_code)
 
 
 if __name__ == '__main__':
