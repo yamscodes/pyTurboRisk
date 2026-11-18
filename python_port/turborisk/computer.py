@@ -13,7 +13,7 @@ from typing import Optional, List, Dict, Any, Tuple
 from .globals import G, MAXTERRITORIES, MAXPLAYERS, GameState, RoutineType, SimStatus
 from .territory import claim_territory, place_armies, transfer_armies, is_adjacent
 from .exp_subr import set_urandom_seed
-from .trp_engine import ScriptExec, TRPError
+from .trp_runtime import TRPRuntimeInstance
 
 
 class TRPError(Exception):
@@ -111,10 +111,10 @@ class ComputerPlayer:
             player = G.ar_player[G.i_turn]
             if player.prg_file and os.path.exists(player.prg_file):
                 try:
-                    ScriptExec.create_context()
-                    ScriptExec.set_player(G.i_turn)
-                    if ScriptExec.load_from_file(player.prg_file):
-                        result = ScriptExec.run_procedure('ASSIGNMENT', [0])
+                    TRPRuntimeInstance.create_context()
+                    TRPRuntimeInstance.set_player(G.i_turn)
+                    if TRPRuntimeInstance.load_from_file(player.prg_file):
+                        result = TRPRuntimeInstance.run_procedure('ASSIGNMENT', [0])
                         if result and len(result) > 0:
                             to_territory = result[0]
                 except Exception as e:
@@ -159,13 +159,13 @@ class ComputerPlayer:
         if player.prg_file and os.path.exists(player.prg_file):
             try:
                 # Load the script
-                ScriptExec.create_context()
-                ScriptExec.set_player(G.i_turn)
-                if not ScriptExec.load_from_file(player.prg_file):
-                    self.log_trp_decision(f"Failed to load script: {ScriptExec.exception_message}")
+                TRPRuntimeInstance.create_context()
+                TRPRuntimeInstance.set_player(G.i_turn)
+                if not TRPRuntimeInstance.load_from_file(player.prg_file):
+                    self.log_trp_decision(f"Failed to load script: {TRPRuntimeInstance.exception_message}")
                 else:
                     # Execute the ASSIGNMENT procedure
-                    result = ScriptExec.run_procedure('ASSIGNMENT', [0])
+                    result = TRPRuntimeInstance.run_procedure('ASSIGNMENT', [0])
                     if result and len(result) > 0:
                         to_territory = result[0]
                         if to_territory and 1 <= to_territory <= MAXTERRITORIES:
@@ -224,13 +224,13 @@ class ComputerPlayer:
         if player.prg_file and os.path.exists(player.prg_file):
             try:
                 # Load the script
-                ScriptExec.create_context()
-                ScriptExec.set_player(G.i_turn)
-                if not ScriptExec.load_from_file(player.prg_file):
-                    self.log_trp_decision(f"Failed to load script: {ScriptExec.exception_message}")
+                TRPRuntimeInstance.create_context()
+                TRPRuntimeInstance.set_player(G.i_turn)
+                if not TRPRuntimeInstance.load_from_file(player.prg_file):
+                    self.log_trp_decision(f"Failed to load script: {TRPRuntimeInstance.exception_message}")
                 else:
                     # Execute the PLACEMENT procedure
-                    result = ScriptExec.run_procedure('PLACEMENT', [0])
+                    result = TRPRuntimeInstance.run_procedure('PLACEMENT', [0])
                     if result and len(result) > 0:
                         to_territory = result[0]
                         if to_territory and 1 <= to_territory <= MAXTERRITORIES:
@@ -302,13 +302,13 @@ class ComputerPlayer:
         if player.prg_file and os.path.exists(player.prg_file):
             try:
                 # Load the script
-                ScriptExec.create_context()
-                ScriptExec.set_player(G.i_turn)
-                if not ScriptExec.load_from_file(player.prg_file):
-                    self.log_trp_decision(f"Failed to load script: {ScriptExec.exception_message}")
+                TRPRuntimeInstance.create_context()
+                TRPRuntimeInstance.set_player(G.i_turn)
+                if not TRPRuntimeInstance.load_from_file(player.prg_file):
+                    self.log_trp_decision(f"Failed to load script: {TRPRuntimeInstance.exception_message}")
                 else:
                     # Execute the ATTACK procedure
-                    result = ScriptExec.run_procedure('ATTACK', [0, 0])
+                    result = TRPRuntimeInstance.run_procedure('ATTACK', [0, 0])
                     if result and len(result) >= 2:
                         from_territory = result[0]
                         to_territory = result[1]
@@ -368,13 +368,13 @@ class ComputerPlayer:
         if player.prg_file and os.path.exists(player.prg_file):
             try:
                 # Load the script
-                ScriptExec.create_context()
-                ScriptExec.set_player(G.i_turn)
-                if not ScriptExec.load_from_file(player.prg_file):
-                    self.log_trp_decision(f"Failed to load script: {ScriptExec.exception_message}")
+                TRPRuntimeInstance.create_context()
+                TRPRuntimeInstance.set_player(G.i_turn)
+                if not TRPRuntimeInstance.load_from_file(player.prg_file):
+                    self.log_trp_decision(f"Failed to load script: {TRPRuntimeInstance.exception_message}")
                 else:
                     # Execute the OCCUPATION procedure
-                    result = ScriptExec.run_procedure('OCCUPATION', [from_territory, to_territory, 0])
+                    result = TRPRuntimeInstance.run_procedure('OCCUPATION', [from_territory, to_territory, 0])
                     if result and len(result) >= 1:
                         armies = result[0]
                         if armies is not None:
@@ -451,13 +451,13 @@ class ComputerPlayer:
         if player.prg_file and os.path.exists(player.prg_file):
             try:
                 # Load the script
-                ScriptExec.create_context()
-                ScriptExec.set_player(G.i_turn)
-                if not ScriptExec.load_from_file(player.prg_file):
-                    self.log_trp_decision(f"Failed to load script: {ScriptExec.exception_message}")
+                TRPRuntimeInstance.create_context()
+                TRPRuntimeInstance.set_player(G.i_turn)
+                if not TRPRuntimeInstance.load_from_file(player.prg_file):
+                    self.log_trp_decision(f"Failed to load script: {TRPRuntimeInstance.exception_message}")
                 else:
                     # Execute the FORTIFICATION procedure
-                    result = ScriptExec.run_procedure('FORTIFICATION', [0, 0, 0])
+                    result = TRPRuntimeInstance.run_procedure('FORTIFICATION', [0, 0, 0])
                     if result and len(result) >= 3:
                         from_territory = result[0]
                         to_territory = result[1]

@@ -568,18 +568,17 @@ class TRPTranspilerV3:
         for i, line in enumerate(lines):
             if not line:
                 continue
-            
-            line = line.lower().strip()
-            
+            line_stripped = line.strip()
+            line_lower = line_stripped.lower()
             # Determine if this line starts a new block
             # Check for block-starting statements (end with : but are not else/elif)
-            is_block_start = line.endswith(':') and not line.startswith(('else:', 'elif'))
+            is_block_start = line_stripped.endswith(':') and not line_lower.startswith(('else:', 'elif'))
             # Check for single-line if statements (if ...: body) - these don't create a new block
-            is_single_line_if = line.startswith('if ') and ':' in line and not line.endswith(':')
+            is_single_line_if = line_lower.startswith('if ') and ':' in line_stripped and not line_stripped.endswith(':')
             # Check for single-line elif statements (elif ...: body) - these don't create a new block
-            is_single_line_elif = line.startswith('elif ') and ':' in line and not line.endswith(':')
-            is_elif = line.startswith('elif ')
-            is_else = line.startswith('else:')
+            is_single_line_elif = line_lower.startswith('elif ') and ':' in line_stripped and not line_stripped.endswith(':')
+            is_elif = line_lower.startswith('elif ')
+            is_else = line_lower.startswith('else:')
             
             # For elif/else, pop the current indent level and use the parent level
             # This applies to all elif/else statements, whether block-starting or single-line
@@ -591,16 +590,16 @@ class TRPTranspilerV3:
             current_indent = indent_stack[-1]
             
             # Add indentation
-            indented_line = ' ' * (current_indent * 4) + line
+            indented_line = ' ' * (current_indent * 4) + line_stripped
             indented_lines.append(indented_line)
             
             # Check if this is an elif/else with no body (next line is also an else/elif or end of block)
             # Only for block-starting elif/else
-            if (is_elif and line.endswith(':')) or is_else:
+            if (is_elif and line_stripped.endswith(':')) or is_else:
                 # Check if the next line is also an else/elif or end of block
                 if i + 1 < len(lines):
-                    next_line = lines[i + 1].lower().strip()
-                    if next_line.startswith('else:') or next_line.startswith('elif '):
+                    next_line_lower = lines[i + 1].strip().lower()
+                    if next_line_lower.startswith('else:') or next_line_lower.startswith('elif '):
                         # This elif/else has no body, add a pass statement
                         pass_line = ' ' * ((current_indent + 1) * 4) + 'pass'
                         indented_lines.append(pass_line)
@@ -609,7 +608,7 @@ class TRPTranspilerV3:
             # Single-line if/elif statements don't create a new block, so don't push to stack
             if is_block_start:
                 indent_stack.append(current_indent + 1)
-            elif is_elif and line.endswith(':'):
+            elif is_elif and line_stripped.endswith(':'):
                 # Block-starting elif needs indentation for its body
                 indent_stack.append(current_indent + 1)
             elif is_else:
@@ -818,6 +817,9 @@ class TRPTranspilerV3:
         body = proc_info['body']
         is_function = proc_info.get('is_function', False)
         
+        # Identify var parameters
+        var_params = [p['name'] for p in params if p.get('is_var', False)]
+        
         # Build parameter list for Python
         param_list = []
         for param in params:
@@ -838,6 +840,22 @@ class TRPTranspilerV3:
             translated = self.translate_statement(line, indent=0)
             if translated:
                 translated_lines.append(translated.strip())
+        
+        # Replace var parameter usage with list indexing
+        # For var parameters, we use list indexing: var_param[0]
+        # This handles both assignments (var_param = value) and reads (if var_param > 0)
+        if var_params:
+            for i, line in enumerate(translated_lines):
+                for var_param in var_params:
+                    # Replace all occurrences of var_param with var_param[0]
+                    # Use word boundaries to avoid replacing partial matches
+                    # Replace standalone var_param (not part of a larger word)
+                    # This handles: assignments (var_param =), reads (var_param >), etc.
+                    translated_lines[i] = re.sub(
+                        rf'\b{var_param}\b',
+                        f'{var_param}[0]',
+                        translated_lines[i]
+                    )
         
         # Now add proper indentation
         indented_lines = self.add_indentation(translated_lines)
