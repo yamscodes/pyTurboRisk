@@ -134,6 +134,7 @@ The original TurboRisk project consists of approximately 111 Pascal files across
 | Territ.pas | turborisk/territory.py | ✅ Complete |
 | ExpSubr.pas | turborisk/exp_subr.py | ✅ Complete |
 | Computer.pas | turborisk/computer.py | ✅ Complete |
+| ActionHistory.pas | turborisk/action_history.py | ✅ Complete |
 | TRSimCLI.lpr | trsim/trsim_cli.py | ✅ Complete |
 | Sim.pas (partial) | trsim/trsim_cli.py | ✅ Partial |
 
@@ -214,7 +215,7 @@ python -m pytest tests/ -v
 
 4. **Advanced Features**: Some advanced features like action history JSONL logging, statistical significance sampling, and error dumping are partially implemented.
 
-5. **Remaining Game Logic**: Some detailed move logic, card handling edge cases, and game state transitions need to be completed.
+5. **Remaining Game Logic**: Some detailed move logic and card handling edge cases need to be completed.
 
 ## Next Steps
 
@@ -243,6 +244,10 @@ python -m pytest tests/ -v
 6. ✅ Fixed line 593 in game_logic.py to use HumanPhase.PLACEMENT instead of HumanPhase.FORTIFICATION
 7. ✅ Added assign_new_armies() function to game_logic.py (in supervisor)
 8. ✅ Improved game state transitions in supervisor()
+9. ✅ Added action_history.py module (ported from ActionHistory.pas)
+10. ✅ Fixed ActionKind enum with all 11 values (AK_ASSIGNMENT through AK_GAME_END)
+11. ✅ Updated territory.py to use action_history.record_game_action
+12. ✅ Removed duplicate ActionEvent class from globals.py
 
 ## Files Not Yet Ported
 
