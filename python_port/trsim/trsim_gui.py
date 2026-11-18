@@ -271,14 +271,14 @@ class TRSimGUI:
         self.players_listbox.delete(0, tk.END)
         
         # Check default players directory
-        players_dir = os.path.join(G.sG_AppPath, 'players')
+        players_dir = os.path.join(G.s_g_app_path, 'players')
         if os.path.exists(players_dir):
             for filename in sorted(os.listdir(players_dir)):
                 if filename.lower().endswith('.trp'):
                     self.players_listbox.insert(tk.END, filename)
         
         # Also check in python_port/players if it exists
-        python_players_dir = os.path.join(os.path.dirname(G.sG_AppPath), 'python_port', 'players')
+        python_players_dir = os.path.join(os.path.dirname(G.s_g_app_path), 'python_port', 'players')
         if os.path.exists(python_players_dir):
             for filename in sorted(os.listdir(python_players_dir)):
                 if filename.lower().endswith('.trp') and filename not in self.players_listbox.get(0, tk.END):
@@ -664,7 +664,7 @@ class TRSimGUI:
         """Show about dialog"""
         messagebox.showinfo("About TRSim", 
                            f"TRSim - TurboRisk Simulation Tool\n\n"
-                           f"Version: {G.sG_AppVers}\n"
+                           f"Version: {G.s_g_app_vers}\n"
                            f"Python Port")
     
     def clear_logs(self):

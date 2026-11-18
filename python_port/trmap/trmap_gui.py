@@ -660,7 +660,7 @@ class TRMapGUI:
         """Show about dialog"""
         messagebox.showinfo("About TRMap", 
                            f"TRMap - Map Editor\n\n"
-                           f"Version: {G.sG_AppVers}\n"
+                           f"Version: {G.s_g_app_vers}\n"
                            f"Python Port")
     
     def confirm_discard_changes(self):

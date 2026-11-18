@@ -47,7 +47,7 @@ class AboutDialog:
         ttk.Label(main_frame, text="TurboRisk", font=('Arial', 16, 'bold')).grid(row=0, column=0, columnspan=2, pady=10)
         
         # Version
-        self.lbl_version = ttk.Label(main_frame, text=f"Version {G.sG_AppVers}", font=('Arial', 12))
+        self.lbl_version = ttk.Label(main_frame, text=f"Version {G.s_g_app_vers}", font=('Arial', 12))
         self.lbl_version.grid(row=1, column=0, columnspan=2, pady=5)
         
         # Credits text
@@ -641,7 +641,7 @@ class MapDialog:
             widget.destroy()
         
         # Try to find .trm files in maps directory
-        maps_dir = os.path.join(G.sG_AppPath, 'maps')
+        maps_dir = os.path.join(G.s_g_app_path, 'maps')
         if os.path.exists(maps_dir):
             try:
                 import glob

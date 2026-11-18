@@ -132,7 +132,7 @@ def new_game_setup():
                 try:
                     TRPRuntimeInstance.create_context()
                     TRPRuntimeInstance.set_player(i)
-                    script_path = os.path.join(G.sG_AppPath, 'players', G.ar_player[i].prg_file)
+                    script_path = os.path.join(G.s_g_app_path, 'players', G.ar_player[i].prg_file)
                     if os.path.exists(script_path):
                         if not TRPRuntimeInstance.load_from_file(script_path):
                             print(f"Error loading script for player {i}: {TRPRuntimeInstance.exception_message}")

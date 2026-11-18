@@ -442,7 +442,7 @@ class TRCompGUI:
         """Show about dialog"""
         messagebox.showinfo("About TRComp", 
                            f"TRComp - TRP Compiler/Editor\n\n"
-                           f"Version: {G.sG_AppVers}\n"
+                           f"Version: {G.s_g_app_vers}\n"
                            f"Python Port")
     
     def confirm_discard_changes(self):
