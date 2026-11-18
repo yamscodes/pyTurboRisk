@@ -64,7 +64,13 @@ class NewGameDialog:
     def on_ok(self):
         """Handle OK button click"""
         # Save settings
-        G.n_players = int(self.num_players.get())
+        num_players = int(self.num_players.get())
+        G.n_players = num_players
+        
+        # Activate the selected number of players
+        for i in range(1, 11):
+            G.ar_player[i].active = (i <= num_players)
+        
         self.result = True
         self.dialog.destroy()
     
