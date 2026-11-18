@@ -226,8 +226,8 @@ python -m pytest tests/ -v
 4. ✅ Port the main TurboRisk game GUI - COMPLETED (Basic structure + all dialogs + game logic)
 
 ### Medium Priority
-1. Port TRComp (compiler/editor)
-2. Port TRMap (map editor)
+1. \u2705 Port TRComp (compiler/editor) - COMPLETED (Basic GUI with syntax highlighting, compilation, and execution)
+2. \u2705 Port TRMap (map editor) - COMPLETED (Basic GUI with territory and continent editing)
 3. Complete TRSim GUI
 
 ### Low Priority
@@ -249,7 +249,7 @@ python -m pytest tests/ -v
 11. ✅ Updated territory.py to use action_history.record_game_action
 12. ✅ Removed duplicate ActionEvent class from globals.py
 13. ✅ Added test_action_history.py with 13 tests for action history module
-14. ✅ All tests pass (9 + 15 + 13 = 37 tests)
+14. ✅ All 41 tests pass
 
 ## Files Not Yet Ported
 
