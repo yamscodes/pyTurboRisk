@@ -42,7 +42,7 @@ class MainGUI:
             raise ImportError("Tkinter is required to run the GUI. Please install tkinter and PIL.")
         
         self.root = root
-        self.root.title(f"TurboRisk {G.sG_AppVers}")
+        self.root.title(f"TurboRisk {G.s_g_app_vers}")
         
         # Set window size
         self.root.geometry("1024x768")
