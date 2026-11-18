@@ -215,7 +215,7 @@ python -m pytest tests/ -v
 
 4. **Advanced Features**: Some advanced features like action history JSONL logging, statistical significance sampling, and error dumping are partially implemented.
 
-5. **Remaining Game Logic**: Some detailed move logic and card handling edge cases need to be completed.
+5. **Remaining Game Logic**: Detailed move logic and card handling edge cases are mostly complete. Some edge cases may need testing.
 
 ## Next Steps
 
@@ -248,6 +248,8 @@ python -m pytest tests/ -v
 10. ✅ Fixed ActionKind enum with all 11 values (AK_ASSIGNMENT through AK_GAME_END)
 11. ✅ Updated territory.py to use action_history.record_game_action
 12. ✅ Removed duplicate ActionEvent class from globals.py
+13. ✅ Added test_action_history.py with 13 tests for action history module
+14. ✅ All tests pass (9 + 15 + 13 = 37 tests)
 
 ## Files Not Yet Ported
 
