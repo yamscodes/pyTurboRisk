@@ -6,6 +6,11 @@ Core modules for the TurboRisk game.
 
 from .globals import G, VERSION, MAXTERRITORIES, MAXPLAYERS
 from .territory import setup_territories, load_map, is_adjacent, is_frontier
+from .action_history import (
+    begin_action_history, end_action_history, record_action, action_count,
+    action_value, start_action_log, stop_action_log, save_action_history,
+    load_action_history, ActionEvent, ActionKind, ActionField
+)
 from .exp_subr import (
     t_name, t_owner, t_armies, t_continent, t_borders_count, t_border,
     t_is_bordering, t_is_front, t_is_mine, t_is_entry, t_fronts_count,

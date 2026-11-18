@@ -243,24 +243,6 @@ class PlayersSet:
     players: List[Dict[str, Any]] = field(default_factory=list)
 
 
-@dataclass
-class ActionEvent:
-    """Action event for history tracking"""
-    kind: int = 0
-    turn: int = 0
-    player: int = 0
-    opponent: int = 0
-    from_territory: int = 0
-    to_territory: int = 0
-    armies: int = 0
-    from_before: int = 0
-    to_before: int = 0
-    from_after: int = 0
-    to_after: int = 0
-    attacker_loss: int = 0
-    defender_loss: int = 0
-    captured: int = 0
-
 
 # ============================================================================
 # GLOBAL VARIABLES
@@ -490,39 +472,8 @@ class ActionField(enum.Enum):
     AF_CAPTURED = 14
 
 
-ACTION_KIND_COUNT = 7
+ACTION_KIND_COUNT = 11
 ACTION_FIELD_COUNT = 14
-
-
-def record_game_action(kind: int, player: int, opponent: int, from_t: int, to_t: int, 
-                       armies: int, from_before: int = 0, to_before: int = 0,
-                       attacker_loss: int = 0, defender_loss: int = 0, captured: int = 0):
-    """Record a game action in the history"""
-    event = ActionEvent()
-    event.kind = kind
-    event.turn = G.i_turn_counter
-    event.player = player
-    event.opponent = opponent
-    event.from_territory = from_t
-    event.to_territory = to_t
-    event.armies = armies
-    event.from_before = from_before
-    event.to_before = to_before
-    
-    if from_t > 0 and from_t <= MAXTERRITORIES:
-        event.from_after = G.ar_territory[from_t].army
-    if to_t > 0 and to_t <= MAXTERRITORIES:
-        event.to_after = G.ar_territory[to_t].army
-    
-    event.attacker_loss = attacker_loss
-    event.defender_loss = defender_loss
-    event.captured = captured
-    
-    G.action_history.append(event)
-
-
-def action_count() -> int:
-    return len(G.action_history)
 
 
 def action_value(index: int, field: int) -> int:

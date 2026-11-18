@@ -175,14 +175,15 @@ def assign_territory(t: int, g: int):
 
 def claim_territory(t: int, g: int):
     """Claim a territory for a player (with initial army)"""
-    from .globals import record_game_action, ActionKind
+    from .globals import ActionKind
+    from .action_history import record_game_action
     before = G.ar_territory[t].army
     assign_territory(t, g)
     G.ar_territory[t].army += 1
     G.ar_player[g].new_army -= 1
     G.ar_player[g].territ += 1
     G.ar_player[g].army += 1
-    record_game_action(ActionKind.AK_ASSIGNMENT.value, g, 0, 0, t, 1, before)
+    record_game_action(ActionKind.AK_ASSIGNMENT, g, 0, 0, t, 1, before)
 
 
 def transfer_armies(from_t: int, to_t: int, armies: int, kind: int):
@@ -196,8 +197,8 @@ def transfer_armies(from_t: int, to_t: int, armies: int, kind: int):
     G.ar_territory[to_t].army += armies
     G.ar_territory[from_t].army -= armies
     
-    from .globals import record_game_action
-    record_game_action(kind, G.i_turn, 0, from_t, to_t, armies, from_before, to_before)
+    from .action_history import record_game_action
+    record_game_action(ActionKind(kind), G.i_turn, 0, from_t, to_t, armies, from_before, to_before)
 
 
 def place_armies(t: int, g: int, armies: int):
