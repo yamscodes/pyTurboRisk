@@ -451,8 +451,13 @@ class ActionKind(enum.Enum):
     AK_ATTACK = 3
     AK_OCCUPATION = 4
     AK_FORTIFICATION = 5
-    AK_ELIMINATION = 6
-    AK_CARD_TRADE = 7
+    AK_TURN_START = 6
+    AK_TURN_END = 7
+    AK_REINFORCEMENT = 8
+    AK_CARD_TRADE = 9
+    AK_ELIMINATION = 10
+    AK_GAME_END = 11
+
 
 
 class ActionField(enum.Enum):
