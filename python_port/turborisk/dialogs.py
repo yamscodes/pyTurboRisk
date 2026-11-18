@@ -459,11 +459,11 @@ class PrefDialog:
     def on_ok(self):
         """Handle OK button click"""
         # Save preferences
-        G.bPrefShowToolbar = self.chk_show_toolbar.get()
-        G.bPrefMapHoover = self.chk_map_hover.get()
-        G.bPrefMapSelected = self.chk_map_selected.get()
-        G.bPrefConfirmAbort = self.chk_confirm_abort.get()
-        G.bPrefExpertAttack = self.chk_expert_attack.get()
+        G.b_pref_show_toolbar = self.chk_show_toolbar.get()
+        G.b_pref_map_hover = self.chk_map_hover.get()
+        G.b_pref_map_selected = self.chk_map_selected.get()
+        G.b_pref_confirm_abort = self.chk_confirm_abort.get()
+        G.b_pref_expert_attack = self.chk_expert_attack.get()
         
         self.result = True
         self.dialog.destroy()

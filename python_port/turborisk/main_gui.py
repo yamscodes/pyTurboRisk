@@ -271,7 +271,7 @@ class MainGUI:
     
     def mnu_fil_save_click(self):
         """Handle Save Game menu click"""
-        if not G.bHumanTurn:
+        if not G.b_human_turn:
             return
         
         filename = filedialog.asksaveasfilename(
@@ -310,17 +310,17 @@ class MainGUI:
         if G.game_state == GameState.STOPPED:
             return
         
-        if G.bPrefConfirmAbort:
+        if G.b_pref_confirm_abort:
             if messagebox.askyesno("Confirm", "Are you sure you want to quit this game?"):
                 pass
             else:
                 return
         
-        if G.bHumanTurn:
+        if G.b_human_turn:
             self.game_cleanup()
             return
         else:
-            G.bStopASAP = True
+            G.b_stop_asap = True
     
     def mnu_fil_exit_click(self):
         """Handle Exit menu click"""
@@ -443,7 +443,7 @@ class MainGUI:
     
     def cmd_end_turn_click(self):
         """Handle End Turn button click"""
-        if G.bHumanTurn and G.game_state == GameState.PLAYING:
+        if G.b_human_turn and G.game_state == GameState.PLAYING:
             self.set_from_territory(0)
             self.set_to_territory(0)
             supervisor()
@@ -487,7 +487,7 @@ class MainGUI:
     
     def img_map_mouse_up(self, event):
         """Handle mouse click on map"""
-        if not G.bHumanTurn:
+        if not G.b_human_turn:
             return
         
         # Find territory at mouse position
@@ -504,7 +504,7 @@ class MainGUI:
             self.set_to_territory(0)
             self.show_instructions()
             
-            if G.bHumanTurn and G.game_state == GameState.PLAYING:
+            if G.b_human_turn and G.game_state == GameState.PLAYING:
                 self.toolbar_buttons["EndTurn"].config(state=tk.NORMAL)
     
     def form_key_down(self, event):
@@ -512,7 +512,7 @@ class MainGUI:
         if event.keysym == "Escape":
             self.root.iconify()
         elif event.keysym == "space":
-            if G.bHumanTurn and G.game_state == GameState.PLAYING:
+            if G.b_human_turn and G.game_state == GameState.PLAYING:
                 self.set_from_territory(0)
                 self.set_to_territory(0)
                 supervisor()
