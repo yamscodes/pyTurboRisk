@@ -28,10 +28,10 @@ from .exp_subr import t_name
 # =============================================================================
 
 # Card types
-CA_INF = 1  # Infantry
-CA_CAV = 2  # Cavalry
-CA_ART = 3  # Artillery
-CA_JOK = 4  # Joker
+CA_INF = 0  # Infantry
+CA_CAV = 1  # Cavalry
+CA_ART = 2  # Artillery
+CA_JOK = 3  # Joker
 
 # Cards set types
 CS_DIF = 1  # Different (one of each)

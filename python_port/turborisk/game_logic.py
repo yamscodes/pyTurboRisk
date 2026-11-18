@@ -32,13 +32,13 @@ def setup():
     setup_territories()
     
     # Set default values
-    G.bG_TRSim = False
+    G.b_g_trsim = False
     G.game_state = GameState.STOPPED
     G.i_turn = 0
-    G.i_turn_counter = 0
-    G.bHumanTurn = False
-    G.bStopASAP = False
-    G.bCloseASAP = False
+    G.i_turn_counter = 1
+    G.b_human_turn = False
+    G.b_stop_asap = False
+    G.b_close_asap = False
     
     # Initialize players
     for i in range(1, MAXPLAYERS + 1):
@@ -93,8 +93,8 @@ def new_game_setup():
         G.ar_territory[i].owner = 0
     
     # Reset continents
-    for cont in range(1, 7):  # coNA to coAU
-        G.ar_continent[cont].owner = 0
+    for cont_id in ContinentID:
+        G.ar_continent[cont_id].owner = 0
     
     # Count active players
     active_count = sum(1 for i in range(1, MAXPLAYERS + 1) if G.ar_player[i].active)
@@ -121,7 +121,7 @@ def new_game_setup():
             G.ar_player[i].army = 0
             
             # Reset cards
-            for card_type in range(1, 5):  # caInf, caArt, caCav, caJok
+            for card_type in range(4):  # caInf, caArt, caCav, caJok (0-3)
                 G.ar_player[i].cards[card_type] = 0
             
             G.ar_player[i].n_scambi = 0
@@ -144,7 +144,7 @@ def new_game_setup():
     # Set game state
     G.game_state = GameState.ASSIGNING
     G.i_turn = 1
-    G.i_turn_counter = 0
+    G.i_turn_counter = 1
     
     # Find first active player
     for i in range(1, MAXPLAYERS + 1):
@@ -153,10 +153,10 @@ def new_game_setup():
             break
     
     # Set human turn
-    G.bHumanTurn = not G.ar_player[G.i_turn].computer
+    G.b_human_turn = not G.ar_player[G.i_turn].computer
     
     # If first player is computer, start supervisor
-    if not G.bHumanTurn:
+    if not G.b_human_turn:
         supervisor()
 
 
@@ -186,13 +186,13 @@ def supervisor():
     from .cards import draw_card as cards_draw_card
     
     while True:
-        if G.bStopASAP:
-            G.bStopASAP = False
+        if G.b_stop_asap:
+            G.b_stop_asap = False
             game_cleanup()
             return
         
-        if G.bCloseASAP:
-            G.bCloseASAP = False
+        if G.b_close_asap:
+            G.b_close_asap = False
             game_cleanup()
             return
         
@@ -201,8 +201,8 @@ def supervisor():
             return
         
         # Handle the case where we enter here after having waited for a Human Player to move
-        if G.bHumanTurn:
-            G.bHumanTurn = False
+        if G.b_human_turn:
+            G.b_human_turn = False
             # Assign a card if necessary
             if G.game_state == GameState.PLAYING and G.ar_player[G.i_turn].fl_conq:
                 cards_draw_card()
@@ -217,7 +217,7 @@ def supervisor():
             if G.ar_player[G.i_turn].computer:
                 execute_computer_turn()
             else:
-                G.bHumanTurn = True
+                G.b_human_turn = True
                 return
         
         elif G.game_state == GameState.DISTRIBUTING:
@@ -225,7 +225,7 @@ def supervisor():
             if G.ar_player[G.i_turn].computer:
                 execute_computer_turn()
             else:
-                G.bHumanTurn = True
+                G.b_human_turn = True
                 return
         
         elif G.game_state == GameState.PLAYING:
@@ -263,7 +263,7 @@ def supervisor():
                     G.to_territory = 0
                     
                     # Human player: wait for a move
-                    G.bHumanTurn = True
+                    G.b_human_turn = True
                     return
             else:
                 # Skip inactive player
@@ -306,9 +306,9 @@ def game_cleanup():
     Ported from GameCleanup procedure in Globals.pas
     """
     G.game_state = GameState.STOPPED
-    G.bHumanTurn = False
-    G.bStopASAP = False
-    G.bCloseASAP = False
+    G.b_human_turn = False
+    G.b_stop_asap = False
+    G.b_close_asap = False
     
     # Reset territories
     for i in range(1, MAXTERRITORIES + 1):
@@ -322,7 +322,7 @@ def game_cleanup():
         G.ar_player[i].army = 0
         
         # Reset cards
-        for card_type in range(1, 5):
+        for card_type in range(4):
             G.ar_player[i].cards[card_type] = 0
         
         G.ar_player[i].n_scambi = 0
@@ -333,7 +333,7 @@ def game_cleanup():
     G.to_territory = 0
     G.i_rank = 0
     G.i_turn = 0
-    G.i_turn_counter = 0
+    G.i_turn_counter = 1
 
 
 # =============================================================================
@@ -492,7 +492,7 @@ def perform_attack(attacker_terr: int, defender_terr: int) -> Tuple[bool, str]:
             msg += f" {G.ar_player[opponent].name} destroyed."
             
             # Capture opponent's cards
-            for card_type in range(1, 5):
+            for card_type in range(4):
                 G.ar_player[G.i_turn].cards[card_type] += G.ar_player[opponent].cards[card_type]
                 G.ar_player[opponent].cards[card_type] = 0
             
