@@ -201,17 +201,17 @@ class MainGUI:
         game_setup()
         
         # Set application path
-        G.sG_AppPath = os.path.dirname(os.path.abspath(__file__)) + os.sep
+        G.s_g_app_path = os.path.dirname(os.path.abspath(__file__)) + os.sep
         
         # Set application path
-        G.sG_AppPath = os.path.dirname(os.path.abspath(__file__)) + os.sep
+        G.s_g_app_path = os.path.dirname(os.path.abspath(__file__)) + os.sep
     
     def load_map_image(self):
         """Load the map image"""
         # Try to find a map image
         map_files = ['std_map.png', 'std_map_small.png', 'world_map.png']
         for map_file in map_files:
-            map_path = os.path.join(G.sG_AppPath, 'maps', map_file)
+            map_path = os.path.join(G.s_g_app_path, 'maps', map_file)
             if os.path.exists(map_path):
                 try:
                     self.map_image = Image.open(map_path)
@@ -277,7 +277,7 @@ class MainGUI:
         filename = filedialog.asksaveasfilename(
             defaultextension=".trg",
             filetypes=[("TurboRisk Game", "*.trg")],
-            initialdir=G.sG_AppPath,
+            initialdir=G.s_g_app_path,
             initialfile="my_game.trg"
         )
         if filename:
@@ -288,7 +288,7 @@ class MainGUI:
         """Handle Restore Game menu click"""
         filename = filedialog.askopenfilename(
             filetypes=[("TurboRisk Game", "*.trg")],
-            initialdir=G.sG_AppPath
+            initialdir=G.s_g_app_path
         )
         if filename:
             self.status_panels[2].config(text="Restoring game, please wait...")
@@ -397,7 +397,7 @@ class MainGUI:
         """Handle Readme menu click"""
         try:
             import webbrowser
-            webbrowser.open(os.path.join(G.sG_AppPath, 'Doc', 'TurboRisk.chm'))
+            webbrowser.open(os.path.join(G.s_g_app_path, 'Doc', 'TurboRisk.chm'))
         except Exception as e:
             self.status_panels[2].config(text=f"Error opening readme: {e}")
     
