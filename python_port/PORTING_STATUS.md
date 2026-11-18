@@ -16,7 +16,7 @@ The original TurboRisk project consists of approximately 123 Pascal files across
 
 ### 1. Core Engine (turborisk/)
 
-#### \u2705 globals.py
+#### ✓ globals.py
 - **Status**: Complete
 - **Ported from**: Globals.pas
 - **Includes**:
@@ -29,7 +29,7 @@ The original TurboRisk project consists of approximately 123 Pascal files across
   - Default player sets initialization
   - Version information
 
-#### \u2705 territory.py
+#### ✓ territory.py
 - **Status**: Complete
 - **Ported from**: Territ.pas
 - **Includes**:
@@ -43,7 +43,7 @@ The original TurboRisk project consists of approximately 123 Pascal files across
   - Frontier detection
   - Flood fill algorithm
 
-#### \u2705 exp_subr.py
+#### ✓ exp_subr.py
 - **Status**: Complete
 - **Ported from**: ExpSubr.pas
 - **Includes**:
@@ -55,7 +55,7 @@ The original TurboRisk project consists of approximately 123 Pascal files across
   - Random number generator state management
   - TRP_FUNCTIONS dictionary for scripting engine integration (100+ functions)
 
-#### \u2705 computer.py
+#### ✓ computer.py
 - **Status**: Complete
 - **Ported from**: Computer.pas
 - **Includes**:
@@ -71,7 +71,7 @@ The original TurboRisk project consists of approximately 123 Pascal files across
   - Turn execution logic
   - TRP script execution integration
 
-#### \u2705 game_logic.py
+#### ✓ game_logic.py
 - **Status**: Complete
 - **Ported from**: Globals.pas (Setup, NewGameSetup, Supervisor, GameCleanup, NextPlayer), NewGame.pas, Rules.pas
 - **Includes**:
@@ -86,7 +86,7 @@ The original TurboRisk project consists of approximately 123 Pascal files across
   - Game phase handling (ASSIGNING, DISTRIBUTING, PLAYING)
   - Attack logic (perform_attack)
 
-#### \u2705 cards.py
+#### ✓ cards.py
 - **Status**: Complete
 - **Ported from**: Cards.pas
 - **Includes**:
@@ -98,7 +98,7 @@ The original TurboRisk project consists of approximately 123 Pascal files across
   - Card trading logic (trade_cards)
   - Card value calculation
 
-#### \u2705 action_history.py
+#### ✓ action_history.py
 - **Status**: Complete
 - **Ported from**: ActionHistory.pas
 - **Includes**:
@@ -112,7 +112,7 @@ The original TurboRisk project consists of approximately 123 Pascal files across
   - JSONL logging (start_action_log, stop_action_log, save_action_history, load_action_history)
   - Game action recording (record_game_action)
 
-#### \u2705 human.py
+#### ✓ human.py
 - **Status**: Complete
 - **Ported from**: Human.pas
 - **Includes**:
@@ -121,7 +121,7 @@ The original TurboRisk project consists of approximately 123 Pascal files across
   - Attack type handling (ATTACK, ATTACK_UNTIL_1, DO_OR_DIE)
   - Human player interaction logic
 
-#### \u2705 main_gui.py
+#### ✓ main_gui.py
 - **Status**: Complete
 - **Ported from**: Main.pas, Main.lfm
 - **Includes**:
@@ -133,7 +133,7 @@ The original TurboRisk project consists of approximately 123 Pascal files across
   - Event bindings
   - All menu handlers (New Game, Save Game, Restore Game, Statistics, History, Log, Rules, Map, Preferences, About)
 
-#### \u2705 new_game_gui.py
+#### ✓ new_game_gui.py
 - **Status**: Complete
 - **Ported from**: NewGame.pas
 - **Includes**:
@@ -143,7 +143,7 @@ The original TurboRisk project consists of approximately 123 Pascal files across
   - Game rules configuration
   - Start game functionality
 
-#### \u2705 dialogs.py
+#### ✓ dialogs.py
 - **Status**: Complete
 - **Ported from**: About.pas, Stats.pas, History.pas, Log.pas, UDialog.pas, Pref.pas, Rules.pas
 - **Includes**:
@@ -158,7 +158,7 @@ The original TurboRisk project consists of approximately 123 Pascal files across
 
 ### 2. TRP Scripting Engine (turborisk/)
 
-#### \u2705 trp_transpiler_v3.py
+#### ✓ trp_transpiler_v3.py
 - **Status**: Complete
 - **Ported from**: PascalScript compiler concepts
 - **Includes**:
@@ -175,7 +175,7 @@ The original TurboRisk project consists of approximately 123 Pascal files across
   - Module management
   - Comprehensive test suite (15 tests)
 
-#### \u2705 trp_runtime.py
+#### ✓ trp_runtime.py
 - **Status**: Complete
 - **Ported from**: PascalScript runtime concepts
 - **Includes**:
@@ -186,7 +186,7 @@ The original TurboRisk project consists of approximately 123 Pascal files across
   - Exception handling
   - Variable management
 
-#### \u2705 trp_executor.py
+#### ✓ trp_executor.py
 - **Status**: Complete
 - **Includes**:
   - TRPExecutor class
@@ -195,7 +195,7 @@ The original TurboRisk project consists of approximately 123 Pascal files across
   - Return value handling
   - Error handling
 
-#### \u2705 trp_engine.py
+#### ✓ trp_engine.py
 - **Status**: Complete
 - **Includes**:
   - Base execution engine
@@ -205,7 +205,7 @@ The original TurboRisk project consists of approximately 123 Pascal files across
 
 ### 3. Simulation Tools (trsim/)
 
-#### \u2705 trsim_cli.py
+#### ✓ trsim_cli.py
 - **Status**: Complete
 - **Ported from**: TRSimCLI.lpr, Sim.pas (RunCLI function)
 - **Includes**:
@@ -220,7 +220,7 @@ The original TurboRisk project consists of approximately 123 Pascal files across
   - Error handling
   - Exit code management
 
-#### \u2705 trsim_gui.py
+#### ✓ trsim_gui.py
 - **Status**: Complete
 - **Ported from**: Sim.pas (GUI components)
 - **Includes**:
@@ -236,7 +236,7 @@ The original TurboRisk project consists of approximately 123 Pascal files across
 
 ### 4. TRComp - TRP Compiler/Editor (trcomp/)
 
-#### \u2705 trcomp_gui.py
+#### ✓ trcomp_gui.py
 - **Status**: Complete
 - **Ported from**: TRComp.lpr, TRCompForm.pas
 - **Includes**:
@@ -254,7 +254,7 @@ The original TurboRisk project consists of approximately 123 Pascal files across
 
 ### 5. TRMap - Map Editor (trmap/)
 
-#### \u2705 trmap_gui.py
+#### ✓ trmap_gui.py
 - **Status**: Complete
 - **Ported from**: TRMap.lpr, TRMapForm.pas
 - **Includes**:
@@ -275,38 +275,38 @@ The original TurboRisk project consists of approximately 123 Pascal files across
 
 | Pascal File | Python Module | Status |
 |-------------|---------------|--------|
-| Globals.pas | turborisk/globals.py | \u2705 Complete |
-| Territ.pas | turborisk/territory.py | \u2705 Complete |
-| ExpSubr.pas | turborisk/exp_subr.py | \u2705 Complete |
-| Computer.pas | turborisk/computer.py | \u2705 Complete |
-| Cards.pas | turborisk/cards.py | \u2705 Complete |
-| ActionHistory.pas | turborisk/action_history.py | \u2705 Complete |
-| Human.pas | turborisk/human.py | \u2705 Complete |
-| Main.pas | turborisk/main_gui.py | \u2705 Complete |
-| NewGame.pas | turborisk/new_game_gui.py | \u2705 Complete |
-| About.pas | turborisk/dialogs.py | \u2705 Complete |
-| Stats.pas | turborisk/dialogs.py | \u2705 Complete |
-| History.pas | turborisk/dialogs.py | \u2705 Complete |
-| Log.pas | turborisk/dialogs.py | \u2705 Complete |
-| UDialog.pas | turborisk/dialogs.py | \u2705 Complete |
-| Pref.pas | turborisk/dialogs.py | \u2705 Complete |
-| Rules.pas | turborisk/dialogs.py | \u2705 Complete |
-| TRSimCLI.lpr | trsim/trsim_cli.py | \u2705 Complete |
-| Sim.pas (partial) | trsim/trsim_gui.py | \u2705 Complete |
-| TRComp.lpr | trcomp/trcomp_gui.py | \u2705 Complete |
-| TRCompForm.pas | trcomp/trcomp_gui.py | \u2705 Complete |
-| TRMap.lpr | trmap/trmap_gui.py | \u2705 Complete |
-| TRMapForm.pas | trmap/trmap_gui.py | \u2705 Complete |
+| Globals.pas | turborisk/globals.py | ✓ Complete |
+| Territ.pas | turborisk/territory.py | ✓ Complete |
+| ExpSubr.pas | turborisk/exp_subr.py | ✓ Complete |
+| Computer.pas | turborisk/computer.py | ✓ Complete |
+| Cards.pas | turborisk/cards.py | ✓ Complete |
+| ActionHistory.pas | turborisk/action_history.py | ✓ Complete |
+| Human.pas | turborisk/human.py | ✓ Complete |
+| Main.pas | turborisk/main_gui.py | ✓ Complete |
+| NewGame.pas | turborisk/new_game_gui.py | ✓ Complete |
+| About.pas | turborisk/dialogs.py | ✓ Complete |
+| Stats.pas | turborisk/dialogs.py | ✓ Complete |
+| History.pas | turborisk/dialogs.py | ✓ Complete |
+| Log.pas | turborisk/dialogs.py | ✓ Complete |
+| UDialog.pas | turborisk/dialogs.py | ✓ Complete |
+| Pref.pas | turborisk/dialogs.py | ✓ Complete |
+| Rules.pas | turborisk/dialogs.py | ✓ Complete |
+| TRSimCLI.lpr | trsim/trsim_cli.py | ✓ Complete |
+| Sim.pas (partial) | trsim/trsim_gui.py | ✓ Complete |
+| TRComp.lpr | trcomp/trcomp_gui.py | ✓ Complete |
+| TRCompForm.pas | trcomp/trcomp_gui.py | ✓ Complete |
+| TRMap.lpr | trmap/trmap_gui.py | ✓ Complete |
+| TRMapForm.pas | trmap/trmap_gui.py | ✓ Complete |
 
 ### TRP Transpiler Files
 
 | Pascal File | Python Module | Status |
 |-------------|---------------|--------|
-| (PascalScript) | turborisk/trp_transpiler_v3.py | \u2705 Complete |
-| (PascalScript) | turborisk/trp_runtime.py | \u2705 Complete |
-| (PascalScript) | turborisk/trp_executor.py | \u2705 Complete |
-| (PascalScript) | turborisk/trp_engine.py | \u2705 Complete |
-| (PascalScript) | turborisk/trp_simple.py | \u2705 Complete |
+| (PascalScript) | turborisk/trp_transpiler_v3.py | ✓ Complete |
+| (PascalScript) | turborisk/trp_runtime.py | ✓ Complete |
+| (PascalScript) | turborisk/trp_executor.py | ✓ Complete |
+| (PascalScript) | turborisk/trp_engine.py | ✓ Complete |
+| (PascalScript) | turborisk/trp_simple.py | ✓ Complete |
 
 ### Additional Files Created
 
@@ -330,15 +330,15 @@ The original TurboRisk project consists of approximately 123 Pascal files across
 ## Testing
 
 ### Test Coverage
-- \u2705 Core data structures (Territory, ContinentInfo, Player, GlobalState)
-- \u2705 Territory setup and adjacency (42 territories, 6 continents)
-- \u2705 Basic TRP API functions (TName, TOwner, TArmies, etc.)
-- \u2705 TRSimCLI command-line interface
-- \u2705 Game initialization and setup
-- \u2705 Simple game execution
-- \u2705 Action history recording and querying
-- \u2705 TRP transpiler (all TRP scripts: simple, doomstack, actuary, etc.)
-- \u2705 End-to-end game flow
+- ✓ Core data structures (Territory, ContinentInfo, Player, GlobalState)
+- ✓ Territory setup and adjacency (42 territories, 6 continents)
+- ✓ Basic TRP API functions (TName, TOwner, TArmies, etc.)
+- ✓ TRSimCLI command-line interface
+- ✓ Game initialization and setup
+- ✓ Simple game execution
+- ✓ Action history recording and querying
+- ✓ TRP transpiler (all TRP scripts: simple, doomstack, actuary, etc.)
+- ✓ End-to-end game flow
 
 ### Test Results
 ```
@@ -421,22 +421,22 @@ python -m unittest discover python_port/tests/ -v
 ## Known Issues
 
 ### Resolved Issues
-1. \u2705 Fixed duplicate code in human.py human_attack() function
-2. \u2705 Fixed FORTIFICATION display issue (was FO********ION due to terminal rendering)
-3. \u2705 Updated AttackDialog to properly handle attack_type parameter
-4. \u2705 Enhanced supervisor() in game_logic.py to handle all game phases
-5. \u2705 Updated draw_card() and turn_in_cards() to use actual implementation from cards.py
-6. \u2705 Fixed HumanPhase references (FORTIFICATION -> PLACEMENT)
-7. \u2705 Added assign_new_armies() function to game_logic.py
-8. \u2705 Improved game state transitions in supervisor()
-9. \u2705 Fixed ActionKind enum with all 11 values
-10. \u2705 Updated territory.py to use action_history.record_game_action
-11. \u2705 Removed duplicate ActionEvent class from globals.py
-12. \u2705 Fixed case sensitivity issues (G.bHumanTurn -> G.b_human_turn, G.bStopASAP -> G.b_stop_asap, etc.)
-13. \u2705 Fixed card type indexing (1-4 -> 0-3)
-14. \u2705 Fixed continent iteration (range(1,7) -> ContinentID enum)
-15. \u2705 Fixed turn counter initialization (0 -> 1)
-16. \u2705 Fixed all card type loops (range(1,5) -> range(4))
+1. ✓ Fixed duplicate code in human.py human_attack() function
+2. ✓ Fixed FORTIFICATION display issue (was FO********ION due to terminal rendering)
+3. ✓ Updated AttackDialog to properly handle attack_type parameter
+4. ✓ Enhanced supervisor() in game_logic.py to handle all game phases
+5. ✓ Updated draw_card() and turn_in_cards() to use actual implementation from cards.py
+6. ✓ Fixed HumanPhase references (FORTIFICATION -> PLACEMENT)
+7. ✓ Added assign_new_armies() function to game_logic.py
+8. ✓ Improved game state transitions in supervisor()
+9. ✓ Fixed ActionKind enum with all 11 values
+10. ✓ Updated territory.py to use action_history.record_game_action
+11. ✓ Removed duplicate ActionEvent class from globals.py
+12. ✓ Fixed case sensitivity issues (G.bHumanTurn -> G.b_human_turn, G.bStopASAP -> G.b_stop_asap, etc.)
+13. ✓ Fixed card type indexing (1-4 -> 0-3)
+14. ✓ Fixed continent iteration (range(1,7) -> ContinentID enum)
+15. ✓ Fixed turn counter initialization (0 -> 1)
+16. ✓ Fixed all card type loops (range(1,5) -> range(4))
 
 ### Current Known Issues
 1. **TRP Script Execution**: TRP scripts can be loaded and executed via TRPRuntimeInstance, but full integration with all game phases needs more testing
@@ -475,43 +475,43 @@ python -m unittest discover python_port/tests/ -v
 ## Progress Summary
 
 ### High Priority Tasks
-1. \u2705 Port the TRP scripting engine (PascalScript) - COMPLETED
+1. ✓ Port the TRP scripting engine (PascalScript) - COMPLETED
    - Created trp_transpiler_v3.py with comprehensive syntax support
    - Created trp_runtime.py for script execution
    - Created trp_executor.py for function execution
    - Created trp_engine.py for base engine
    - All TRP scripts can be transpiled and executed
 
-2. \u2705 Test TRP transpiler with all TRP scripts (doomstack, actuary, etc.) - COMPLETED
+2. ✓ Test TRP transpiler with all TRP scripts (doomstack, actuary, etc.) - COMPLETED
    - 15 comprehensive tests in test_trp_transpiler.py
    - All TRP scripts in players/ directory can be transpiled
    - All TRP scripts in bot-archive/ can be transpiled
 
-3. \u2705 Implement actual TRP script execution in computer.py - COMPLETED
+3. ✓ Implement actual TRP script execution in computer.py - COMPLETED
    - TRPRuntimeInstance integrated with computer.py
    - TRP scripts can be loaded and executed
    - ASSIGNMENT, PLACEMENT, ATTACK, OCCUPATION, FORTIFICATION procedures supported
 
-4. \u2705 Port the main TurboRisk game GUI - COMPLETED
+4. ✓ Port the main TurboRisk game GUI - COMPLETED
    - Main GUI with menu bar, toolbar, map panel, status bar
    - All dialogs implemented (About, Stats, History, Log, Players, Pref, Rules, Map)
    - Game logic integrated (New Game, Save Game, Restore Game, End Game, etc.)
    - Attack and Move dialogs implemented
 
 ### Medium Priority Tasks
-1. \u2705 Port TRComp (compiler/editor) - COMPLETED
+1. ✓ Port TRComp (compiler/editor) - COMPLETED
    - Full GUI with source editor, API browser, diagnostics
    - Compilation using TRP transpiler
    - Script execution using TRPRuntimeInstance
    - File management and editing
 
-2. \u2705 Port TRMap (map editor) - COMPLETED
+2. ✓ Port TRMap (map editor) - COMPLETED
    - Full GUI with map canvas, territory and continent editing
    - Visual map display with territory highlighting
    - Border editing
    - Map file loading and saving
 
-3. \u2705 Complete TRSim GUI - COMPLETED
+3. ✓ Complete TRSim GUI - COMPLETED
    - Full GUI with simulation controls, player management
    - Multi-game simulation support
    - Game logging and statistics
@@ -537,7 +537,7 @@ python -m unittest discover python_port/tests/ -v
 
 The **majority of the TurboRisk project has been successfully ported to Python**, including:
 
-### \u2705 Completed (Core Functionality)
+### ✓ Completed (Core Functionality)
 - All data structures and constants
 - Territory and map handling (42 territories, 6 continents)
 - All 100+ TRP API functions
@@ -547,14 +547,14 @@ The **majority of the TurboRisk project has been successfully ported to Python**
 - Game logic (setup, supervisor, cleanup, turns)
 - Card management (drawing, trading, values)
 
-### \u2705 Completed (GUI Applications)
+### ✓ Completed (GUI Applications)
 - Main TurboRisk game GUI
 - TRSim CLI (command-line simulation runner)
 - TRSim GUI (graphical simulation tool)
 - TRComp GUI (TRP compiler/editor)
 - TRMap GUI (map editor)
 
-### \u2705 Completed (Testing)
+### ✓ Completed (Testing)
 - 41 comprehensive tests
 - All tests passing
 - Test coverage for core functionality, TRP transpiler, action history, and game flow
