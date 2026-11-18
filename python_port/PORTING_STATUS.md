@@ -220,7 +220,7 @@ python -m pytest tests/ -v
 1. ✅ Port the TRP scripting engine (PascalScript) - COMPLETED
 2. ✅ Test TRP transpiler with all TRP scripts (doomstack, actuary, etc.) - COMPLETED
 3. ✅ Implement actual TRP script execution in computer.py - COMPLETED
-4. Port the main TurboRisk game GUI
+4. ✅ Port the main TurboRisk game GUI - COMPLETED (Basic structure)
 
 ### Medium Priority
 1. Port TRComp (compiler/editor)
