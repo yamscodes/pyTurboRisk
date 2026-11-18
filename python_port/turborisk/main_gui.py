@@ -247,9 +247,9 @@ class MainGUI:
         
         # Show New Game dialog
         try:
-            from .new_game_gui import NewGameDialog
-            dlg = NewGameDialog(self.root)
-            if dlg.show():
+            from .dialogs import PlayersDialog
+            dlg = PlayersDialog(self.root)
+            if dlg.show_modal():
                 self.status_panels[2].config(text="Preparing new game, please wait...")
                 self.root.update()
                 
@@ -323,48 +323,87 @@ class MainGUI:
     
     def mnu_vie_stats_click(self):
         """Handle Statistics menu click"""
-        # TODO: Show/hide Stats window
-        pass
+        try:
+            from .dialogs import StatsDialog
+            if not hasattr(self, 'stats_dialog'):
+                self.stats_dialog = StatsDialog(self.root)
+            self.stats_dialog.show()
+        except ImportError:
+            self.status_panels[2].config(text="GUI not available - Tkinter required")
     
     def mnu_vie_hist_click(self):
         """Handle History menu click"""
-        # TODO: Show History dialog
-        pass
+        try:
+            from .dialogs import HistoryDialog
+            dlg = HistoryDialog(self.root)
+            dlg.show_modal()
+        except ImportError:
+            self.status_panels[2].config(text="GUI not available - Tkinter required")
     
     def mnu_vie_log_click(self):
         """Handle Log menu click"""
-        # TODO: Show/hide Log window
-        pass
+        try:
+            from .dialogs import LogDialog
+            if not hasattr(self, 'log_dialog'):
+                self.log_dialog = LogDialog(self.root)
+            self.log_dialog.show()
+        except ImportError:
+            self.status_panels[2].config(text="GUI not available - Tkinter required")
     
     def mnu_opt_players_click(self):
         """Handle Players menu click"""
-        # TODO: Show Players dialog
-        pass
+        try:
+            from .dialogs import PlayersDialog
+            dlg = PlayersDialog(self.root)
+            dlg.show_modal()
+        except ImportError:
+            self.status_panels[2].config(text="GUI not available - Tkinter required")
     
     def mnu_opt_map_click(self):
         """Handle Map menu click"""
-        # TODO: Show Map dialog
-        pass
+        try:
+            from .dialogs import MapDialog
+            dlg = MapDialog(self.root)
+            if dlg.show_modal():
+                # Map changed, reload
+                self.load_map_image()
+        except ImportError:
+            self.status_panels[2].config(text="GUI not available - Tkinter required")
     
     def mnu_opt_rules_click(self):
         """Handle Rules menu click"""
-        # TODO: Show Rules dialog
-        pass
+        try:
+            from .dialogs import RulesDialog
+            dlg = RulesDialog(self.root)
+            dlg.show_modal()
+        except ImportError:
+            self.status_panels[2].config(text="GUI not available - Tkinter required")
     
     def mnu_opt_pref_click(self):
         """Handle Preferences menu click"""
-        # TODO: Show Preferences dialog
-        pass
+        try:
+            from .dialogs import PrefDialog
+            dlg = PrefDialog(self.root)
+            dlg.show_modal()
+        except ImportError:
+            self.status_panels[2].config(text="GUI not available - Tkinter required")
     
     def mnu_hel_readme_click(self):
         """Handle Readme menu click"""
-        # TODO: Show Readme
-        pass
+        try:
+            import webbrowser
+            webbrowser.open(os.path.join(G.sG_AppPath, 'Doc', 'TurboRisk.chm'))
+        except Exception as e:
+            self.status_panels[2].config(text=f"Error opening readme: {e}")
     
     def mnu_hel_about_click(self):
         """Handle About menu click"""
-        # TODO: Show About dialog
-        pass
+        try:
+            from .dialogs import AboutDialog
+            dlg = AboutDialog(self.root)
+            dlg.show_modal()
+        except ImportError:
+            self.status_panels[2].config(text="GUI not available - Tkinter required")
     
     def mnu_hel_homepage_click(self):
         """Handle Homepage menu click"""
