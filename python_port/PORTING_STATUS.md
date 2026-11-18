@@ -219,7 +219,7 @@ python -m pytest tests/ -v
 ### High Priority
 1. ✅ Port the TRP scripting engine (PascalScript) - COMPLETED
 2. ✅ Test TRP transpiler with all TRP scripts (doomstack, actuary, etc.) - COMPLETED
-3. Implement actual TRP script execution in computer.py
+3. ✅ Implement actual TRP script execution in computer.py - COMPLETED
 4. Port the main TurboRisk game GUI
 
 ### Medium Priority
