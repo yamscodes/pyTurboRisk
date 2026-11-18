@@ -206,13 +206,15 @@ python -m pytest tests/ -v
 
 ## Known Issues
 
-1. **TRP Script Execution**: The actual TRP script execution is not yet implemented. Currently, simple AI routines are used as placeholders.
+1. **TRP Script Execution**: The actual TRP script execution is implemented via TRPRuntimeInstance. TRP scripts can be loaded and executed.
 
-2. **GUI Components**: The GUI applications (TurboRisk, TRSim, TRComp, TRMap) are not yet ported. Only the command-line interface (TRSimCLI) is functional.
+2. **GUI Components**: The GUI applications (TRComp, TRMap) are not yet ported. TurboRisk GUI has basic structure, all dialogs, and game logic implemented.
 
-3. **PascalScript Engine**: The PascalScript compiler and runtime are not yet ported to Python.
+3. **PascalScript Engine**: The PascalScript compiler and runtime are ported to Python via TRPRuntimeInstance.
 
 4. **Advanced Features**: Some advanced features like action history JSONL logging, statistical significance sampling, and error dumping are partially implemented.
+
+5. **Remaining Game Logic**: Some detailed move logic, card handling edge cases, and game state transitions need to be completed.
 
 ## Next Steps
 
@@ -231,6 +233,16 @@ python -m pytest tests/ -v
 1. Port all TRP bot scripts to Python
 2. Add network multiplayer support
 3. Add advanced GUI features
+
+### Completed in this session:
+1. ✅ Fixed duplicate code in human.py human_attack() function
+2. ✅ Fixed FORTIFICATION display issue (terminal rendering, actual file is correct)
+3. ✅ Updated AttackDialog to properly handle attack_type parameter
+4. ✅ Enhanced supervisor() in game_logic.py to handle game phases properly
+5. ✅ Updated draw_card() and turn_in_cards() to use actual implementation from cards.py
+6. ✅ Fixed line 593 in game_logic.py to use HumanPhase.PLACEMENT instead of HumanPhase.FORTIFICATION
+7. ✅ Added assign_new_armies() function to game_logic.py (in supervisor)
+8. ✅ Improved game state transitions in supervisor()
 
 ## Files Not Yet Ported
 
