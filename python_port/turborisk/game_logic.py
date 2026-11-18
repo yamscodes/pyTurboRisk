@@ -48,7 +48,7 @@ def setup():
         G.ar_player[i].color = get_default_color(i)
         G.ar_player[i].prg_file = ""
         G.ar_player[i].keep_log = False
-        G.ar_player[i].cards_handling = CardsHandling.CONSTANT
+        G.ar_player[i].cards_handling = CardsHandling.MANUAL
     
     # Set player 1 as human by default
     G.ar_player[1].active = True
