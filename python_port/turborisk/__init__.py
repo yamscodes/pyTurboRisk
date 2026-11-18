@@ -30,3 +30,7 @@ from .network import (
     NetworkMessage, NetworkMessageType, NetworkPlayer, NetworkServer,
     NetworkClient, NetworkGameManager, start_network_game
 )
+from .gui_advanced import (
+    ColorManager, StatisticsVisualizer, MapVisualizer, Tooltip,
+    GameReplay, show_advanced_statistics, show_game_replay, create_map_visualizer
+)
