@@ -228,7 +228,7 @@ python -m pytest tests/ -v
 ### Medium Priority
 1. \u2705 Port TRComp (compiler/editor) - COMPLETED (Basic GUI with syntax highlighting, compilation, and execution)
 2. \u2705 Port TRMap (map editor) - COMPLETED (Basic GUI with territory and continent editing)
-3. Complete TRSim GUI
+3. \u2705 Complete TRSim GUI - COMPLETED (Basic GUI with simulation controls, player management, and logging)
 
 ### Low Priority
 1. Port all TRP bot scripts to Python
