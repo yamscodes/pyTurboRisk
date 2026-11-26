@@ -1,0 +1,773 @@
+{% extends "base.html" %}
+
+{% block title %}TurboRisk - Game{% endblock %}
+
+{% block extra_css %}
+<style>
+    .game-board {
+        display: grid;
+        grid-template-columns: 300px 1fr 300px;
+        gap: 20px;
+        height: calc(100vh - 120px);
+    }
+    
+    .sidebar {
+        background: #2c3e50;
+        padding: 15px;
+        border-radius: 8px;
+        overflow-y: auto;
+    }
+    
+    .player-info {
+        background: #34495e;
+        padding: 10px;
+        margin-bottom: 15px;
+        border-radius: 5px;
+        border: 2px solid transparent;
+    }
+    
+    .player-info.current-player {
+        border-color: #f1c40f;
+        background: #3d566e;
+    }
+    
+    .player-name {
+        font-weight: bold;
+        font-size: 1.1em;
+        margin-bottom: 5px;
+    }
+    
+    .player-stats {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 5px;
+        font-size: 0.9em;
+    }
+    
+    .stat-label {
+        color: #95a5a6;
+    }
+    
+    .stat-value {
+        color: #ecf0f1;
+    }
+    
+    .territory-list {
+        background: #34495e;
+        padding: 10px;
+        border-radius: 5px;
+        margin-top: 15px;
+    }
+    
+    .territory-item {
+        padding: 8px;
+        margin: 5px 0;
+        border-radius: 3px;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    
+    .territory-item:hover {
+        background: #3d566e;
+    }
+    
+    .territory-item.owned {
+        background: #2ecc71;
+        color: #2c3e50;
+    }
+    
+    .territory-item.owned:hover {
+        background: #27ae60;
+    }
+    
+    .map-container {
+        position: relative;
+        background: #1a252f;
+        border-radius: 8px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .map-canvas {
+        flex: 1;
+        background: linear-gradient(135deg, #1a252f 0%, #2c3e50 100%);
+        position: relative;
+        cursor: crosshair;
+    }
+    
+    .territory-overlay {
+        position: absolute;
+        border: 2px solid transparent;
+        border-radius: 50%;
+        transition: all 0.2s;
+    }
+    
+    .territory-overlay:hover {
+        transform: scale(1.1);
+        z-index: 10;
+    }
+    
+    .territory-overlay.selected {
+        border-color: #f1c40f;
+        box-shadow: 0 0 15px rgba(241, 196, 15, 0.7);
+    }
+    
+    .territory-overlay.attack-source {
+        border-color: #e74c3c;
+        box-shadow: 0 0 15px rgba(231, 76, 60, 0.7);
+    }
+    
+    .territory-overlay.attack-target {
+        border-color: #3498db;
+        box-shadow: 0 0 15px rgba(52, 152, 219, 0.7);
+    }
+    
+    .territory-label {
+        position: absolute;
+        color: white;
+        font-size: 11px;
+        font-weight: bold;
+        text-shadow: 1px 1px 2px black;
+        pointer-events: none;
+        z-index: 5;
+    }
+    
+    .army-count {
+        position: absolute;
+        color: white;
+        font-size: 14px;
+        font-weight: bold;
+        text-shadow: 1px 1px 2px black;
+        pointer-events: none;
+        z-index: 5;
+    }
+    
+    .player-color-1 { background: #0000ff; }
+    .player-color-2 { background: #ff0000; }
+    .player-color-3 { background: #00ff00; }
+    .player-color-4 { background: #ffff00; color: #000 !important; }
+    .player-color-5 { background: #ff00ff; }
+    .player-color-6 { background: #00ffff; }
+    
+    .phase-indicator {
+        text-align: center;
+        padding: 10px;
+        margin-bottom: 15px;
+        background: #34495e;
+        border-radius: 5px;
+        font-weight: bold;
+        font-size: 1.2em;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+        justify-content: center;
+    }
+    
+    .action-info {
+        background: #34495e;
+        padding: 10px;
+        border-radius: 5px;
+        margin-top: 15px;
+        text-align: center;
+    }
+    
+    .continent-info {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-top: 15px;
+    }
+    
+    .continent-item {
+        background: #34495e;
+        padding: 8px;
+        border-radius: 5px;
+        text-align: center;
+    }
+    
+    .continent-item.owned {
+        background: #2ecc71;
+        color: #2c3e50;
+    }
+    
+    .army-input {
+        width: 60px;
+        padding: 5px;
+        text-align: center;
+    }
+    
+    @media (max-width: 1024px) {
+        .game-board {
+            grid-template-columns: 1fr;
+            grid-template-rows: auto 1fr auto;
+        }
+        
+        .sidebar {
+            max-height: 200px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block header_center %}
+<div class="phase-indicator" id="phase-indicator">
+    {% if phase == 'assigning' %}
+        <span style="color: #f39c12;">⚔️ Assignment Phase</span>
+    {% elif phase == 'distributing' %}
+        <span style="color: #3498db;">🏰 Placement Phase</span>
+    {% elif phase == 'placement' %}
+        <span style="color: #3498db;">🏰 Placement Phase</span>
+    {% elif phase == 'attack' %}
+        <span style="color: #e74c3c;">⚔️ Attack Phase</span>
+    {% else %}
+        <span>🌍 Playing</span>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="game-board">
+    <!-- Left Sidebar - Players -->
+    <div class="sidebar">
+        <h3>Players</h3>
+        {% for player in players %}
+        <div class="player-info {% if player.id == current_player_id %}current-player{% endif %}" 
+             style="border-color: {{ player.color }};">
+            <div class="player-name" style="color: {{ player.color }};">
+                {{ player.name }}
+                {% if player.id == current_player_id %}<span style="color: #f1c40f;"> (Current)</span>{% endif %}
+            </div>
+            <div class="player-stats">
+                <div><span class="stat-label">Armies:</span> <span class="stat-value">{{ player.armies }}</span></div>
+                <div><span class="stat-label">Territories:</span> <span class="stat-value">{{ player.territories }}</span></div>
+                <div><span class="stat-label">New Armies:</span> <span class="stat-value">{{ player.new_army }}</span></div>
+                <div><span class="stat-label">Cards:</span> <span class="stat-value">{{ player.cards|join(', ') }}</span></div>
+            </div>
+        </div>
+        {% endfor %}
+        
+        <div class="action-info">
+            <div><strong>Current Player:</strong> {{ current_player.name }}</div>
+            {% if current_player.new_army > 0 %}
+                <div style="color: #f1c40f; margin-top: 5px;">
+                    <strong>New Armies to Place: {{ current_player.new_army }}</strong>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Center - Map -->
+    <div class="map-container">
+        <div class="map-canvas" id="map-canvas">
+            <!-- Territory overlays will be added dynamically via JavaScript -->
+            <svg id="map-svg" width="100%" height="100%" viewBox="0 0 1000 600">
+                <!-- Map background -->
+                <rect width="100%" height="100%" fill="#1a252f" />
+                
+                <!-- Territory labels and army counts will be added by JavaScript -->
+            </svg>
+        </div>
+        
+        <div class="action-buttons" id="action-buttons">
+            {% if phase == 'placement' %}
+                <button class="btn btn-primary" onclick="placeArmy()">Place Army</button>
+            {% endif %}
+            {% if phase == 'attack' %}
+                <button class="btn btn-danger" onclick="confirmAttack()">Confirm Attack</button>
+                <button class="btn btn-secondary" onclick="cancelAction()">Cancel</button>
+            {% endif %}
+            <button class="btn btn-success" onclick="endTurn()">End Turn</button>
+        </div>
+    </div>
+    
+    <!-- Right Sidebar - Territories and Info -->
+    <div class="sidebar">
+        <h3>Territories</h3>
+        <div class="territory-list" id="territory-list">
+            {% for terr in territories %}
+            <div class="territory-item {% if terr.owner == current_player_id %}owned{% endif %}"
+                 style="border-left: 3px solid {{ terr.color if terr.color else '#95a5a6' }};"
+                 onclick="selectTerritory({{ terr.id }})"
+                 data-id="{{ terr.id }}">
+                <strong>{{ terr.name }}</strong>
+                <div>
+                    Owner: 
+                    {% if terr.owner > 0 %}
+                        <span style="color: {{ players[terr.owner-1].color if terr.owner <= players|length }};">
+                            {{ players[terr.owner-1].name if terr.owner <= players|length }}
+                        </span>
+                    {% else %}
+                        <span style="color: #95a5a6;">None</span>
+                    {% endif %}
+                    | Armies: {{ terr.army }}
+                </div>
+                <div style="font-size: 0.8em; color: #95a5a6;">{{ terr.continent }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <h3>Continents</h3>
+        <div class="continent-info">
+            {% for cont in continents %}
+            <div class="continent-item {% if cont.owner > 0 %}owned{% endif %}">
+                <div><strong>{{ cont.name }}</strong></div>
+                <div>Bonus: {{ cont.bonus }}</div>
+                {% if cont.owner > 0 %}
+                    <div>Owner: {{ players[cont.owner-1].name if cont.owner <= players|length }}</div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Territory Info Modal -->
+<div id="territory-modal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000;">
+    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #2c3e50; padding: 20px; border-radius: 8px; max-width: 400px; width: 90%;">
+        <h3 id="modal-title">Territory Info</h3>
+        <div id="modal-content"></div>
+        <button class="btn btn-primary" onclick="closeModal()" style="margin-top: 15px;">Close</button>
+    </div>
+</div>
+
+<!-- Army Placement Modal -->
+<div id="army-modal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000;">
+    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #2c3e50; padding: 20px; border-radius: 8px; max-width: 400px; width: 90%;">
+        <h3>Place Armies</h3>
+        <div style="margin: 15px 0;">
+            <label for="army-count">Number of Armies:</label>
+            <input type="number" id="army-count" class="army-input" value="1" min="1" max="{{ current_player.new_army }}">
+        </div>
+        <button class="btn btn-primary" onclick="placeSelectedArmies()">Place</button>
+        <button class="btn btn-secondary" onclick="closeArmyModal()" style="margin-left: 10px;">Cancel</button>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Territory positions (simplified - these should match the actual map)
+    const territoryPositions = {
+        1: { x: 50, y: 100 },   // Alaska
+        2: { x: 150, y: 100 },  // Northwest Territory
+        3: { x: 250, y: 50 },   // Greenland
+        4: { x: 150, y: 150 },  // Alberta
+        5: { x: 250, y: 150 },  // Ontario
+        6: { x: 300, y: 150 },  // Quebec
+        7: { x: 150, y: 200 },  // Western US
+        8: { x: 250, y: 200 },  // Eastern US
+        9: { x: 200, y: 250 },  // Central America
+        10: { x: 200, y: 300 }, // Venezuela
+        11: { x: 200, y: 350 }, // Peru
+        12: { x: 250, y: 350 }, // Brazil
+        13: { x: 250, y: 400 }, // Argentina
+        14: { x: 400, y: 300 }, // North Africa
+        15: { x: 450, y: 300 }, // Egypt
+        16: { x: 450, y: 350 }, // East Africa
+        17: { x: 400, y: 350 }, // Congo
+        18: { x: 450, y: 400 }, // South Africa
+        19: { x: 500, y: 400 }, // Madagascar
+        20: { x: 400, y: 50 },  // Iceland
+        21: { x: 450, y: 100 }, // Scandinavia
+        22: { x: 500, y: 100 }, // Ukraine
+        23: { x: 450, y: 150 }, // Northern Europe
+        24: { x: 400, y: 150 }, // Great Britain
+        25: { x: 400, y: 200 }, // Western Europe
+        26: { x: 450, y: 200 }, // Southern Europe
+        27: { x: 500, y: 200 }, // Middle East
+        28: { x: 600, y: 100 }, // Yamal-Nemets
+        29: { x: 600, y: 150 }, // Kazakhstan
+        30: { x: 600, y: 200 }, // India
+        31: { x: 650, y: 250 }, // Siam
+        32: { x: 650, y: 200 }, // China
+        33: { x: 650, y: 150 }, // Mongolia
+        34: { x: 700, y: 100 }, // Taymyr
+        35: { x: 750, y: 100 }, // Yakut
+        36: { x: 700, y: 150 }, // Buryat
+        37: { x: 750, y: 150 }, // Koryak
+        38: { x: 800, y: 150 }, // Japan
+        39: { x: 700, y: 300 }, // Indonesia
+        40: { x: 750, y: 350 }, // Western Australia
+        41: { x: 800, y: 350 }, // Eastern Australia
+        42: { x: 750, y: 300 }  // New Guinea
+    };
+    
+    // Player colors
+    const playerColors = [
+        '#0000ff', '#ff0000', '#00ff00', '#ffff00', '#ff00ff', '#00ffff', '#800000', '#008000'
+    ];
+    
+    let selectedTerritory = null;
+    let attackFrom = null;
+    let attackTo = null;
+    
+    // Initialize the map
+    function initMap() {
+        const svg = document.getElementById('map-svg');
+        svg.innerHTML = '<rect width="100%" height="100%" fill="#1a252f" />';
+        
+        // Add territory overlays
+        {% for terr in territories %}
+        const terrId = {{ terr.id }};
+        const pos = territoryPositions[terrId];
+        if (pos) {
+            const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            circle.setAttribute('cx', pos.x);
+            circle.setAttribute('cy', pos.y);
+            circle.setAttribute('r', 20);
+            circle.setAttribute('class', 'territory-overlay');
+            circle.setAttribute('data-id', terrId);
+            circle.setAttribute('stroke', 'transparent');
+            circle.setAttribute('stroke-width', '2');
+            circle.setAttribute('fill', 'transparent');
+            circle.style.cursor = 'pointer';
+            circle.addEventListener('click', () => selectTerritory(terrId));
+            circle.addEventListener('mouseenter', () => highlightTerritory(terrId));
+            circle.addEventListener('mouseleave', () => unhighlightTerritory(terrId));
+            svg.appendChild(circle);
+            
+            // Add territory label
+            const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            text.setAttribute('x', pos.x);
+            text.setAttribute('y', pos.y - 25);
+            text.setAttribute('text-anchor', 'middle');
+            text.setAttribute('fill', 'white');
+            text.setAttribute('font-size', '10');
+            text.setAttribute('font-weight', 'bold');
+            text.textContent = '{{ terr.name[:3] }}';
+            text.classList.add('territory-label');
+            svg.appendChild(text);
+            
+            // Add army count
+            const armyText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            armyText.setAttribute('x', pos.x);
+            armyText.setAttribute('y', pos.y + 5);
+            armyText.setAttribute('text-anchor', 'middle');
+            armyText.setAttribute('fill', 'white');
+            armyText.setAttribute('font-size', '12');
+            armyText.setAttribute('font-weight', 'bold');
+            armyText.textContent = '{{ terr.army }}';
+            armyText.classList.add('army-count');
+            armyText.setAttribute('data-id', terrId);
+            svg.appendChild(armyText);
+            
+            // Add owner indicator
+            if ({{ terr.owner }} > 0) {
+                const ownerCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                ownerCircle.setAttribute('cx', pos.x);
+                ownerCircle.setAttribute('cy', pos.y);
+                ownerCircle.setAttribute('r', 10);
+                ownerCircle.setAttribute('fill', playerColors[{{ terr.owner }}-1]);
+                ownerCircle.setAttribute('data-id', terrId);
+                ownerCircle.classList.add('owner-indicator');
+                svg.appendChild(ownerCircle);
+            }
+        }
+        {% endfor %}
+        
+        // Update territory states
+        updateTerritoryStates();
+    }
+    
+    function updateTerritoryStates() {
+        const svg = document.getElementById('map-svg');
+        const circles = svg.querySelectorAll('.territory-overlay');
+        
+        circles.forEach(circle => {
+            circle.classList.remove('selected', 'attack-source', 'attack-target');
+            
+            const terrId = parseInt(circle.getAttribute('data-id'));
+            if (selectedTerritory === terrId) {
+                circle.classList.add('selected');
+            }
+            if (attackFrom === terrId) {
+                circle.classList.add('attack-source');
+            }
+            if (attackTo === terrId) {
+                circle.classList.add('attack-target');
+            }
+        });
+    }
+    
+    function highlightTerritory(terrId) {
+        const circle = document.querySelector(`[data-id="${terrId}"]`);
+        if (circle) {
+            circle.setAttribute('stroke', '#f1c40f');
+        }
+    }
+    
+    function unhighlightTerritory(terrId) {
+        const circle = document.querySelector(`[data-id="${terrId}"]`);
+        if (circle && !circle.classList.contains('selected') && 
+            !circle.classList.contains('attack-source') && 
+            !circle.classList.contains('attack-target')) {
+            circle.setAttribute('stroke', 'transparent');
+        }
+    }
+    
+    function selectTerritory(terrId) {
+        const phase = '{{ phase }}';
+        
+        if (phase === 'placement' || phase === 'distributing') {
+            // Place armies
+            placeArmyOnTerritory(terrId);
+        } else if (phase === 'attack') {
+            if (attackFrom === null) {
+                // Select attack source
+                fetch(`/select_territory/${terrId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            if (data.action === 'select_attack_source') {
+                                attackFrom = terrId;
+                                selectedTerritory = terrId;
+                                updateTerritoryStates();
+                                updateMessage(data.message);
+                            } else {
+                                updateMessage(data.message);
+                            }
+                        }
+                    });
+            } else if (attackFrom !== null && attackTo === null) {
+                // Select attack target
+                fetch(`/select_territory/${terrId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            if (data.action === 'select_attack_target') {
+                                attackTo = terrId;
+                                selectedTerritory = terrId;
+                                updateTerritoryStates();
+                                updateMessage(data.message);
+                            } else {
+                                updateMessage(data.message);
+                            }
+                        }
+                    });
+            } else if (attackFrom !== null && attackTo !== null) {
+                // Confirm attack
+                if (terrId === attackTo) {
+                    fetch(`/attack/${attackFrom}/${attackTo}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                updateMessage(data.message);
+                                attackFrom = null;
+                                attackTo = null;
+                                selectedTerritory = null;
+                                updateTerritoryStates();
+                                
+                                // Update army counts
+                                updateArmyCount(attackFrom, data.from_army);
+                                updateArmyCount(attackTo, data.to_army);
+                                
+                                // Update owner if conquered
+                                if (data.conquest && data.to_owner > 0) {
+                                    updateOwner(attackTo, data.to_owner);
+                                }
+                                
+                                // Check if we can attack again
+                                if (data.message.includes('can attack again')) {
+                                    attackFrom = attackFrom;
+                                }
+                            }
+                        });
+                } else {
+                    // Cancel and select new
+                    attackFrom = null;
+                    attackTo = null;
+                    selectedTerritory = null;
+                    updateTerritoryStates();
+                    updateMessage('Attack cancelled.');
+                }
+            }
+        }
+    }
+    
+    function placeArmyOnTerritory(terrId) {
+        fetch(`/select_territory/${terrId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    updateMessage(data.message);
+                    updateArmyCount(terrId, data.territory_army);
+                    
+                    // Update new army count display
+                    const newArmyDisplay = document.querySelector('.stat-value:last-child');
+                    if (newArmyDisplay) {
+                        newArmyDisplay.textContent = data.new_army;
+                    }
+                    
+                    // Check if we need to move to next phase
+                    if (data.new_army <= 0) {
+                        location.reload();
+                    }
+                } else {
+                    updateMessage(data.message);
+                }
+            });
+    }
+    
+    function placeArmy() {
+        const modal = document.getElementById('army-modal');
+        modal.style.display = 'block';
+    }
+    
+    function placeSelectedArmies() {
+        const terrId = selectedTerritory;
+        const armies = parseInt(document.getElementById('army-count').value);
+        
+        if (terrId && armies > 0) {
+            fetch(`/place_armies/${terrId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ armies: armies })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    updateMessage(data.message);
+                    updateArmyCount(terrId, data.territory_army);
+                    closeArmyModal();
+                    
+                    // Update new army count
+                    const newArmyDisplay = document.querySelector('.stat-value:last-child');
+                    if (newArmyDisplay) {
+                        newArmyDisplay.textContent = data.new_army;
+                    }
+                    
+                    if (data.new_army <= 0) {
+                        location.reload();
+                    }
+                }
+            });
+        }
+    }
+    
+    function confirmAttack() {
+        if (attackFrom && attackTo) {
+            fetch(`/attack/${attackFrom}/${attackTo}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        updateMessage(data.message);
+                        attackFrom = null;
+                        attackTo = null;
+                        selectedTerritory = null;
+                        updateTerritoryStates();
+                        
+                        // Update army counts
+                        updateArmyCount(attackFrom, data.from_army);
+                        updateArmyCount(attackTo, data.to_army);
+                        
+                        // Update owner if conquered
+                        if (data.conquest && data.to_owner > 0) {
+                            updateOwner(attackTo, data.to_owner);
+                        }
+                    }
+                });
+        }
+    }
+    
+    function endTurn() {
+        fetch('/end_turn')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    updateMessage(data.message);
+                    location.reload();
+                }
+            });
+    }
+    
+    function cancelAction() {
+        fetch('/cancel_action')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    attackFrom = null;
+                    attackTo = null;
+                    selectedTerritory = null;
+                    updateTerritoryStates();
+                    updateMessage(data.message);
+                }
+            });
+    }
+    
+    function updateMessage(message) {
+        const messageEl = document.getElementById('game-message');
+        if (messageEl) {
+            messageEl.textContent = message;
+        }
+    }
+    
+    function updateArmyCount(terrId, count) {
+        const armyText = document.querySelector(`text.army-count[data-id="${terrId}"]`);
+        if (armyText) {
+            armyText.textContent = count;
+        }
+    }
+    
+    function updateOwner(terrId, playerId) {
+        // Remove existing owner indicator
+        const existing = document.querySelector(`.owner-indicator[data-id="${terrId}"]`);
+        if (existing) {
+            existing.remove();
+        }
+        
+        // Add new owner indicator
+        const pos = territoryPositions[terrId];
+        if (pos) {
+            const svg = document.getElementById('map-svg');
+            const ownerCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            ownerCircle.setAttribute('cx', pos.x);
+            ownerCircle.setAttribute('cy', pos.y);
+            ownerCircle.setAttribute('r', 10);
+            ownerCircle.setAttribute('fill', playerColors[playerId-1]);
+            ownerCircle.setAttribute('data-id', terrId);
+            ownerCircle.classList.add('owner-indicator');
+            svg.appendChild(ownerCircle);
+        }
+        
+        // Update territory list
+        updateTerritoryList();
+    }
+    
+    function updateTerritoryList() {
+        fetch('/get_game_state')
+            .then(response => response.json())
+            .then(data => {
+                // Could update the territory list here if needed
+            });
+    }
+    
+    function closeModal() {
+        document.getElementById('territory-modal').style.display = 'none';
+    }
+    
+    function closeArmyModal() {
+        document.getElementById('army-modal').style.display = 'none';
+    }
+    
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', () => {
+        initMap();
+        
+        // Set initial phase
+        const phase = '{{ phase }}';
+        const message = '{{ message }}';
+        updateMessage(message);
+    });
+    
+    // Handle window resize
+    window.addEventListener('resize', () => {
+        // Could handle responsive adjustments here
+    });
+</script>
+{% endblock %}

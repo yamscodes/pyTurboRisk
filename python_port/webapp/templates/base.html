@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}TurboRisk{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="page-container">
+        <header class="game-header">
+            <div class="header-left">
+                <h1 class="game-title">TurboRisk</h1>
+            </div>
+            <div class="header-center">
+                {% block header_center %}{% endblock %}
+            </div>
+            <div class="header-right">
+                {% block header_right %}
+                <a href="{{ url_for('new_game') }}" class="btn btn-new-game">New Game</a>
+                {% endblock %}
+            </div>
+        </header>
+        
+        <main class="main-content">
+            {% block content %}{% endblock %}
+        </main>
+        
+        <footer class="game-footer">
+            <div class="footer-left">
+                <span class="game-message" id="game-message">{{ message if message else '' }}</span>
+            </div>
+            <div class="footer-right">
+                <span class="version-info">Version 2.1.2 - Python Web Port</span>
+            </div>
+        </footer>
+    </div>
+    
+    <script src="{{ url_for('static', filename='js/game.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

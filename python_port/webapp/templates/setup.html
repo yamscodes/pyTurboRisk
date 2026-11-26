@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}TurboRisk - Game Setup{% endblock %}
+
+{% block content %}
+<div class="setup-container">
+    <h1>TurboRisk - Game Setup</h1>
+    
+    <form method="POST" action="{{ url_for('setup') }}" class="setup-form">
+        <div class="form-group">
+            <label for="num_players">Number of Players:</label>
+            <select id="num_players" name="num_players" required>
+                <option value="2">2 Players</option>
+                <option value="3">3 Players</option>
+                <option value="4">4 Players</option>
+                <option value="5">5 Players</option>
+                <option value="6">6 Players</option>
+            </select>
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Start Game</button>
+        </div>
+    </form>
+    
+    <div class="setup-info">
+        <h3>How to Play:</h3>
+        <ul>
+            <li><strong>Assignment Phase:</strong> Territories are automatically assigned to players.</li>
+            <li><strong>Placement Phase:</strong> Place your initial armies on your territories.</li>
+            <li><strong>Attack Phase:</strong> Attack adjacent enemy territories by rolling dice.</li>
+            <li><strong>Movement Phase:</strong> Move armies between your territories at the end of your turn.</li>
+        </ul>
+        
+        <p><strong>Objective:</strong> Conquer all territories to win the game!</p>
+    </div>
+</div>
+{% endblock %}
