@@ -37,12 +37,15 @@ This web application provides a browser-based interface to play TurboRisk, the R
 
 3. Run the application:
    ```bash
-   python run.py
+   python run.py                    # Default port 5000
+   python run.py --port 5001        # Run on port 5001
+   python run.py -p 5001           # Short form
    ```
 
 4. Open your browser and navigate to:
    ```
-   http://localhost:5000
+   http://localhost:5000           # If using default port
+   http://localhost:5001           # If using port 5001
    ```
 
 ## Usage
@@ -125,7 +128,7 @@ The Flask app uses the following configuration:
 - `SECRET_KEY`: Used for session management (change in production)
 - `DEBUG`: Set to True in development
 - `HOST`: 0.0.0.0 (accessible from network)
-- `PORT`: 5000
+- `PORT`: 5000 (configurable via command line with `--port` or `-p` flag)
 
 ## Development
 
