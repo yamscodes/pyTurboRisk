@@ -641,10 +641,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     
-    // Auto-refresh game state periodically (only on game page)
-    if (window.location.pathname === '/') {
-        setInterval(loadTerritoryData, 5000);
-    }
+    // Auto-refresh game state periodically
+    setInterval(loadTerritoryData, 5000);
 });
 
 // Make functions globally available
